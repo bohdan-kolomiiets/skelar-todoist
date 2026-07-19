@@ -15,5 +15,14 @@
     "figma@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true,
     "serena@claude-plugins-official": true
+  },
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:vercel.com)",
+      "Bash(git remote *)",
+      "Bash(npm run *)",
+      "Bash(npm install *)",
+      "Bash(npm test *)"
+    ]
   }
 }

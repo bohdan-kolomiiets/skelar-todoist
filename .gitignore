@@ -29,6 +29,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Claude Code — keep shared settings.json, ignore personal local overrides
+.claude/settings.local.json
+
 # Editor / OS
 .DS_Store
 *.pem
