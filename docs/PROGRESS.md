@@ -6,9 +6,8 @@
 > Last updated: 2026-07-19
 
 ## Current phase
-Phase 0 (infrastructure) **complete** — including live deploy and local secrets.
-Next: Phase 1 (product spec / brainstorm), in parallel with finishing the CI/CD
-test gate.
+Phase 0 (infrastructure) **complete** — including live deploy, local secrets, and
+the CI/CD test gate. Next: Phase 1 (product spec / brainstorm).
 
 ## Done
 - [x] Git repo on `main`; GitHub remote (`github.com:bohdan-kolomiiets/skelar-todoist`)
@@ -27,19 +26,19 @@ test gate.
   pulled via CLI for Development by design). Local dev has everything it needs.
 - [x] CI/CD model decided: **Option A** (Vercel Git integration + branch
   protection on `main`) — see "Key decisions made"
+- [x] GitHub Actions workflow (`.github/workflows/ci.yml`: lint + typecheck +
+  unit + e2e) runs on PRs into `main` and pushes to `main`; e2e runs against a
+  local `next dev` server in CI (no Vercel preview wiring needed since the gate
+  lives on the PR, independent of the deploy)
+- [x] Branch protection on `main`: PRs required (no direct pushes, no force
+  push, no deletion), `test` CI check required, 0 mandatory reviewers (solo
+  project)
 
 ## Next (in order)
-1. **Finish the CI/CD gate.** Option A is chosen; workflow added:
-   - [x] Add a GitHub Actions workflow (lint + typecheck + unit + e2e) —
-     `.github/workflows/ci.yml`, runs on PRs into `main` and pushes to `main`;
-     e2e runs against a local `next dev` server in CI (no Vercel preview
-     wiring needed since the gate lives on the PR, independent of the deploy)
-   - [ ] Turn on branch protection on `main` requiring that workflow to pass
-     (+ require PRs, no direct pushes)
-2. **Phase 1 — brainstorm `docs/PRODUCT.md`.** Lock the `Task` data schema (the
+1. **Phase 1 — brainstorm `docs/PRODUCT.md`.** Lock the `Task` data schema (the
    core UI↔AI contract) and the Capture / Inbox / Today screens. Use the
    brainstorming skill. Do this *before* feature code.
-3. **Phase 2 — build the core flow end-to-end** (Capture → AI parse → tasks →
+2. **Phase 2 — build the core flow end-to-end** (Capture → AI parse → tasks →
    Today), TDD, one vertical slice at a time.
 
 ## Open decisions
