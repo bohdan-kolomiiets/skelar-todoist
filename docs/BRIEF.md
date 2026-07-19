@@ -85,6 +85,20 @@ Next.js проєкт «AI-планер дня».
 - follow software principles: SOLID Design Principles, SoC (Separation of Concerns), DRY (Don't Repeat Yourself), KISS (Keep It Simple, Stupid), YAGNI (You Aren't Gonna Need It) !!!
 
 
+#### API-ключ
+
+Підготовка: API-ключ і чеклист
+
+1. Створи ключ
+console.anthropic.com → Settings → API keys → Create Key.
+
+2. Збережи одразу
+Ключ показується один раз. Модель для парсингу запиту користувача — claude-haiku швидка й дешева
+
+3. Безпека ключа
+Не коміть у GitHub і не вставляй у код браузера. На Vercel він живе в env-змінній ANTHROPIC_API_KEY. У промпти — жодних даних під NDA.
+
+
 #### Рекомендовані приклади Advanced ideas
 
 Якщо костяк готовий — повна свобода покращувати продукт.
