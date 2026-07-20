@@ -6,10 +6,10 @@
 > Last updated: 2026-07-20
 
 ## Current phase
-Phase 1 (product spec / brainstorm) **complete** — [PRODUCT.md](./PRODUCT.md) is fully
-groomed (Task schema + AI contract, all core screens, access / onboarding / freemium), with
-low-fi mockups in [mockups/](./mockups/) and every open decision closed. Next: write the
-implementation plan, then Phase 2 (build the core flow end-to-end, TDD).
+Phase 1 (product spec / brainstorm) **complete**; **implementation plan for the core flow
+written** → [docs/superpowers/plans/2026-07-20-core-flow.md](./superpowers/plans/2026-07-20-core-flow.md)
+(19 bite-sized TDD tasks, 2 deployable milestones). Next: **Phase 2 — execute the plan**,
+starting with Milestone A (the manual-planner substrate), one vertical slice at a time.
 
 ## Done
 - [x] Git repo on `main`; GitHub remote (`github.com:bohdan-kolomiiets/skelar-todoist`)
@@ -45,14 +45,20 @@ implementation plan, then Phase 2 (build the core flow end-to-end, TDD).
   sheets), Review (+ edge cases), task editor, New-task entry, Today, Inbox, empty states.
   Mobile-first, borderless **pill** tab bar. Welcome / Plans / Settings specified (§12/§14),
   mockups optional.
+- [x] **Core-flow implementation plan written** (writing-plans skill) →
+  [docs/superpowers/plans/2026-07-20-core-flow.md](./superpowers/plans/2026-07-20-core-flow.md).
+  19 bite-sized TDD tasks in 2 deployable milestones: **A** = manual-planner substrate
+  (model → storage → Today/Inbox → editor), **B** = AI capture (parser → `/api/organize` →
+  Capture → Review → deterministic e2e). Milestone C (edge/empty/onboarding) + Plan 2
+  (auth/freemium/voice) outlined for later.
 
 ## Next (in order)
-1. **Write the implementation plan** from [PRODUCT.md](./PRODUCT.md) (use the
-   writing-plans skill) — sequence the vertical slices before touching code.
-2. **Phase 2 — build the core flow end-to-end** (Capture → AI parse → Review → Today),
-   TDD, one vertical slice at a time. Suggested order: `Task` model + swappable storage
-   interface → mock-LLM parse boundary (`/api/organize`) → Capture/Review → Today/Inbox →
-   editor → auth/freemium shell.
+1. **Phase 2 — execute the core-flow plan**, Milestone A first (Tasks 1–11 → deployable
+   manual planner), then Milestone B (Tasks 12–19 → graded AI flow). TDD, one slice at a
+   time. Execution mode TBD (subagent-driven vs inline).
+2. **Milestone C** — needs-a-date, first-run onboarding, exact empty-state copy, quick-add
+   AI entry points (polish on the working core).
+3. **Plan 2** — access ladder, freemium metering, Plans/Settings/Welcome, voice fake-door.
 
 ## Open decisions
 - **(Optional, low priority) Mock-AI fallback for local dev.** Once the AI route
@@ -80,3 +86,19 @@ implementation plan, then Phase 2 (build the core flow end-to-end, TDD).
   of truth for the Task schema, screens, routing, priority, freemium, and onboarding.
 - **Edge Config** created + linked in Vercel with key `freeDailyInputs = 3` (free daily AI
   limit; runtime-tunable without redeploy, fallback constant `3`).
+- **AI integration: Vercel AI SDK (`ai`) + AI Gateway**, model `anthropic/claude-haiku-4.5`,
+  structured output enforced by a `zod` contract schema. Behind a `TaskParser` interface.
+  **Gateway is Vercel-managed (OIDC auth)** — zero token markup, $5/mo free credits, no
+  provider key to manage; auth via `VERCEL_OIDC_TOKEN` (`vercel env pull` locally, automatic
+  on deploys). The earlier `AI_API_KEY` is **no longer used** for parsing (candidate to retire).
+  Haiku ≈ $1/M in, $5/M out → ~0.2¢ per brain-dump parse.
+- **Dual-mode parsing via Edge Config `aiMode` (`fake`|`real`)** — a deterministic rule-based
+  `FakeTaskParser` (local dev, tests, and an instant grading fallback) vs the real
+  `GatewayTaskParser`. Resolution: Edge Config `aiMode` → env `AI_MODE` → default `fake`;
+  prod sets `real`. Fake mode makes the full-flow e2e run with **no API key**.
+- **Prompt evaluation via a golden dataset** (`src/lib/ai/fixtures/parseCases.ts`): shared
+  invariants drive deterministic Vitest snapshots of the fake parser **and** an opt-in
+  `npm run eval:ai` that checks the real model. Added deps (at build time): `ai`, `zod`, `tsx`.
+- **One additive schema field** planned: `needsDate?: boolean` (optional, zero-migration) for
+  the Inbox "Needs a date" section — the locked §3 `Task` schema otherwise can't distinguish
+  ambiguous-undated from Someday backlog.
