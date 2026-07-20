@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Empty states</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.31.0/tabler-icons.min.css">
+<style>
+:root{
+--surface-2:#ffffff;--surface-1:#f4f2ec;--surface-0:#eceae3;
+--border:rgba(0,0,0,.10);--border-strong:rgba(0,0,0,.20);
+--text-primary:#2b2a27;--text-secondary:#5f5e5a;--text-muted:#8a8983;
+--text-accent:#185fa5;--fill-accent:#1f6fd0;--on-accent:#ffffff;--bg-accent:#e6f1fb;
+--bg-success:#e1f5ee;--text-success:#0f6e56;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--text-primary);-webkit-font-smoothing:antialiased;display:flex;flex-wrap:wrap;gap:20px;justify-content:center;padding:24px;background:var(--surface-0)}
+button{font-family:inherit;cursor:pointer}
+.ph{width:340px;background:var(--surface-2);border:0.5px solid var(--border);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;min-height:420px}
+.ehdr{padding:16px 16px 6px}
+.ehdr p{margin:0}
+.ebody{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 26px;gap:6px}
+.eicon{width:56px;height:56px;border-radius:50%;background:var(--surface-1);display:flex;align-items:center;justify-content:center;color:var(--text-muted);margin-bottom:6px}
+.etitle{font-size:16px;font-weight:500}
+.esub{font-size:13px;color:var(--text-secondary);line-height:1.5;max-width:230px}
+.eprimary{display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:10px 18px;border:0;border-radius:999px;background:var(--fill-accent);color:var(--on-accent);font-size:14px;font-weight:500}
+.esec{margin-top:2px;border:0;background:none;color:var(--text-accent);font-size:13px}
+.tabs{display:flex;border-top:0.5px solid var(--border);padding:2px 4px 6px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;font-size:11px;color:var(--text-muted);background:none;border:0}
+.tab i{font-size:20px}.tab.on{color:var(--text-accent)}
+.sq{display:flex;align-items:center;justify-content:center;width:46px;height:30px;border-radius:11px;background:var(--bg-accent)}
+</style>
+</head>
+<body>
+
+  <div class="ph">
+    <div class="ehdr"><p style="font-size:20px;font-weight:500">Today</p><p style="font-size:13px;color:var(--text-secondary)">Monday, Jul 20</p></div>
+    <div class="ebody">
+      <div class="eicon"><i class="ti ti-checklist" style="font-size:26px" aria-hidden="true"></i></div>
+      <p class="etitle">Nothing planned</p>
+      <p class="esub">Capture your thoughts or pull from Inbox</p>
+      <button class="eprimary"><i class="ti ti-bulb" style="font-size:16px" aria-hidden="true"></i>Capture</button>
+      <button class="esec">Pull from Inbox</button>
+    </div>
+    <nav class="tabs"><button class="tab"><i class="ti ti-bulb" aria-hidden="true"></i>Capture</button><button class="tab on"><span class="sq"><i class="ti ti-sun" aria-hidden="true"></i></span>Today</button><button class="tab"><i class="ti ti-inbox" aria-hidden="true"></i>Inbox</button></nav>
+  </div>
+
+  <div class="ph">
+    <div class="ehdr"><p style="font-size:20px;font-weight:500">Today</p><p style="font-size:13px;color:var(--text-secondary)">Monday, Jul 20</p></div>
+    <div class="ebody">
+      <div class="eicon"><i class="ti ti-checklist" style="font-size:26px" aria-hidden="true"></i></div>
+      <p class="etitle">Nothing planned</p>
+      <p class="esub">Capture your thoughts</p>
+      <button class="eprimary"><i class="ti ti-bulb" style="font-size:16px" aria-hidden="true"></i>Capture</button>
+    </div>
+    <nav class="tabs"><button class="tab"><i class="ti ti-bulb" aria-hidden="true"></i>Capture</button><button class="tab on"><span class="sq"><i class="ti ti-sun" aria-hidden="true"></i></span>Today</button><button class="tab"><i class="ti ti-inbox" aria-hidden="true"></i>Inbox</button></nav>
+  </div>
+
+  <div class="ph">
+    <div class="ehdr"><p style="font-size:20px;font-weight:500">Inbox</p></div>
+    <div class="ebody">
+      <div class="eicon" style="background:var(--bg-success);color:var(--text-success)"><i class="ti ti-checks" style="font-size:26px" aria-hidden="true"></i></div>
+      <p class="etitle">Inbox zero</p>
+      <p class="esub">Nothing waiting — capture your thoughts</p>
+      <button class="eprimary"><i class="ti ti-bulb" style="font-size:16px" aria-hidden="true"></i>Capture</button>
+    </div>
+    <nav class="tabs"><button class="tab"><i class="ti ti-bulb" aria-hidden="true"></i>Capture</button><button class="tab"><i class="ti ti-sun" aria-hidden="true"></i>Today</button><button class="tab on"><span class="sq"><i class="ti ti-inbox" aria-hidden="true"></i></span>Inbox</button></nav>
+  </div>
+
+</body>
+</html>

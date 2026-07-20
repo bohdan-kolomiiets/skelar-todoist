@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Edit task</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.31.0/tabler-icons.min.css">
+<style>
+:root{
+--surface-2:#ffffff;--surface-1:#f4f2ec;--surface-0:#eceae3;
+--border:rgba(0,0,0,.10);--border-strong:rgba(0,0,0,.20);
+--text-primary:#2b2a27;--text-secondary:#5f5e5a;--text-muted:#8a8983;--text-disabled:#b7b5ac;
+--text-accent:#185fa5;--text-danger:#a32d2d;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--text-primary);-webkit-font-smoothing:antialiased;display:flex;justify-content:center;padding:24px;background:var(--surface-0)}
+button{font-family:inherit;cursor:pointer}
+.phone{width:340px;min-height:600px;background:var(--surface-2);border:0.5px solid var(--border);border-radius:22px;overflow:hidden;display:flex;flex-direction:column}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:0.5px solid var(--border)}
+.tinp{width:100%;border:0;background:transparent;font-family:inherit;font-size:18px;font-weight:500;color:var(--text-primary);padding:12px 0 6px}
+.ninp{width:100%;border:0;background:transparent;font-family:inherit;font-size:14px;color:var(--text-primary);padding:2px 0 10px}
+.ninp::placeholder,.tinp::placeholder{color:var(--text-muted)}
+.row{display:flex;align-items:center;gap:12px;width:100%;padding:13px 2px;border:0;border-bottom:0.5px solid var(--border);background:none;text-align:left;cursor:pointer}
+.rowic{font-size:19px;color:var(--text-secondary);width:20px;text-align:center}
+.rowlabel{font-size:15px;color:var(--text-primary)}
+.rowval{margin-left:auto;font-size:14px;color:var(--text-secondary);display:inline-flex;align-items:center;gap:5px}
+.rowchev{font-size:16px;color:var(--text-muted)}
+.mut{color:var(--text-muted)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:3px 9px;border-radius:999px;border:0.5px solid var(--border);background:var(--surface-1);color:var(--text-secondary)}
+.del{display:inline-flex;align-items:center;gap:7px;margin-top:18px;border:0;background:none;color:var(--text-danger);font-size:14px;padding:4px 0}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="hdr">
+    <button aria-label="Close" style="border:0;background:none;color:var(--text-secondary);padding:2px"><i class="ti ti-x" style="font-size:22px" aria-hidden="true"></i></button>
+    <span style="font-size:16px;font-weight:500">Edit task</span>
+    <button style="border:0;background:none;color:var(--text-accent);font-size:15px;font-weight:500">Done</button>
+  </div>
+
+  <div style="flex:1;padding:8px 16px 16px">
+    <input class="tinp" value="Finish the pitch deck" />
+    <input class="ninp" placeholder="Add notes" />
+
+    <button class="row" style="border-top:0.5px solid var(--border)">
+      <i class="ti ti-calendar rowic" aria-hidden="true"></i><span class="rowlabel">When</span>
+      <span class="rowval">Today</span><i class="ti ti-chevron-right rowchev" aria-hidden="true"></i>
+    </button>
+
+    <button class="row">
+      <i class="ti ti-clock rowic" aria-hidden="true"></i><span class="rowlabel">Time</span>
+      <span class="rowval mut">Add time</span><i class="ti ti-chevron-right rowchev" aria-hidden="true"></i>
+    </button>
+
+    <button class="row">
+      <i class="ti ti-sun rowic" aria-hidden="true"></i><span class="rowlabel">Part of day</span>
+      <span class="rowval">Evening</span><i class="ti ti-chevron-right rowchev" aria-hidden="true"></i>
+    </button>
+
+    <button class="row">
+      <i class="ti ti-flag rowic" aria-hidden="true"></i><span class="rowlabel">Priority</span>
+      <span class="rowval" style="color:var(--text-danger)"><i class="ti ti-flag" style="font-size:14px" aria-hidden="true"></i>Important</span><i class="ti ti-chevron-right rowchev" aria-hidden="true"></i>
+    </button>
+
+    <button class="row">
+      <i class="ti ti-alarm rowic" aria-hidden="true"></i><span class="rowlabel">Deadline</span>
+      <span class="rowval">due Fri</span><i class="ti ti-chevron-right rowchev" aria-hidden="true"></i>
+    </button>
+
+    <div class="row" style="cursor:default">
+      <i class="ti ti-tag rowic" aria-hidden="true"></i><span class="rowlabel">Tags</span>
+      <span style="margin-left:auto;display:flex;gap:6px"><span class="chip">work</span><span class="chip" style="border-style:dashed;color:var(--text-muted)"><i class="ti ti-plus" style="font-size:12px" aria-hidden="true"></i>add</span></span>
+    </div>
+
+    <button class="del"><i class="ti ti-trash" style="font-size:17px" aria-hidden="true"></i>Delete task</button>
+  </div>
+
+</div>
+</body>
+</html>
