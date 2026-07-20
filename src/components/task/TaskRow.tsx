@@ -14,9 +14,10 @@ interface Props {
   onOpen(task: Task): void;
   onMove(id: string, view: "today" | "inbox"): void;
   moveTarget: "today" | "inbox";
+  trailing?: React.ReactNode;
 }
 
-export function TaskRow({ task, today, onToggle, onOpen, onMove, moveTarget }: Props) {
+export function TaskRow({ task, today, onToggle, onOpen, onMove, moveTarget, trailing }: Props) {
   const done = task.status === "done";
   const hasMetas = task.deadline || task.timeOfDay || task.tags.length > 0;
   return (
@@ -53,6 +54,8 @@ export function TaskRow({ task, today, onToggle, onOpen, onMove, moveTarget }: P
           </span>
         )}
       </button>
+
+      {trailing && <span className="flex-shrink-0">{trailing}</span>}
 
       <button
         type="button"

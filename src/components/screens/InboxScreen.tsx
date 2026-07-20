@@ -38,14 +38,11 @@ export function InboxScreen() {
             <div>
               <p className="mb-0.5 mt-3.5 text-[13px] font-medium text-text-secondary">Scheduled · {scheduled.length}</p>
               {scheduled.map((task) => (
-                <div key={task.id} className="flex items-center gap-2">
-                  <TaskRow {...rowProps(task)} />
-                  {task.doDate && (
-                    <span className="shrink-0">
-                      <Chip>{formatDoDate(task.doDate, today)}</Chip>
-                    </span>
-                  )}
-                </div>
+                <TaskRow
+                  key={task.id}
+                  {...rowProps(task)}
+                  trailing={task.doDate ? <Chip>{formatDoDate(task.doDate, today)}</Chip> : undefined}
+                />
               ))}
             </div>
           )}
@@ -60,7 +57,7 @@ export function InboxScreen() {
         </>
       )}
 
-      <button type="button" onClick={() => setEditing("new")} className="mt-2 flex w-full items-center gap-2.5 py-3 text-left text-sm text-text-secondary">
+      <button type="button" onClick={() => setEditing("new")} className="mt-2 flex min-h-11 w-full items-center gap-2.5 py-3 text-left text-sm text-text-secondary">
         + Add task
       </button>
 

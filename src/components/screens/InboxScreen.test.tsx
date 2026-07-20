@@ -28,5 +28,6 @@ describe("InboxScreen", () => {
     expect(screen.getByText("Scheduled · 1")).toBeInTheDocument();
     expect(screen.getByText("Someday · 1")).toBeInTheDocument();
     expect(screen.getByText("Learn guitar")).toBeInTheDocument();
+    expect(screen.getByText("Jan 1")).toBeInTheDocument();
   });
 });
