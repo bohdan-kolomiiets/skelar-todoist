@@ -39,4 +39,11 @@ describe("TaskRow", () => {
     await userEvent.click(screen.getByText("Finish the pitch deck"));
     expect(onOpen).toHaveBeenCalledWith(task);
   });
+
+  it("shows done state and suppresses priority flag when task is completed", () => {
+    const doneTask = { ...task, status: "done" as const };
+    render(<TaskRow task={doneTask} today={TODAY} onToggle={vi.fn()} onOpen={vi.fn()} onMove={vi.fn()} moveTarget="inbox" />);
+    expect(screen.getByRole("button", { name: /completed/i })).toBeInTheDocument();
+    expect(screen.queryByLabelText(/high priority/i)).toBeNull();
+  });
 });

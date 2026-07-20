@@ -25,12 +25,16 @@ export function TaskRow({ task, today, onToggle, onOpen, onMove, moveTarget }: P
         type="button"
         aria-label={done ? "Completed" : "Complete"}
         onClick={() => onToggle(task.id)}
-        className={cn(
-          "h-5 w-5 flex-shrink-0 rounded-full border-[1.5px]",
-          done ? "border-text-muted bg-text-muted text-surface-2" : "border-border-strong",
-        )}
+        className="-ml-3 flex h-11 w-11 flex-shrink-0 items-center justify-center"
       >
-        {done ? "✓" : ""}
+        <span
+          className={cn(
+            "flex h-5 w-5 items-center justify-center rounded-full border-[1.5px] text-[11px]",
+            done ? "border-text-muted bg-text-muted text-surface-2" : "border-border-strong",
+          )}
+        >
+          {done ? "✓" : ""}
+        </span>
       </button>
 
       <button type="button" onClick={() => onOpen(task)} className="flex-1 text-left">
@@ -54,7 +58,7 @@ export function TaskRow({ task, today, onToggle, onOpen, onMove, moveTarget }: P
         type="button"
         aria-label={`Move to ${moveTarget}`}
         onClick={() => onMove(task.id, moveTarget)}
-        className="flex-shrink-0 rounded-full border border-border px-2.5 py-1.5 text-xs text-text-secondary"
+        className="flex min-h-11 flex-shrink-0 items-center rounded-full border border-border px-3 text-xs text-text-secondary"
       >
         → {moveTarget === "today" ? "Today" : "Inbox"}
       </button>
