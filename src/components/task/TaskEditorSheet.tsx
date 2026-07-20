@@ -31,10 +31,10 @@ export function TaskEditorSheet({ open, initial, title = "Edit task", onClose, o
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-surface-2" role="dialog" aria-label={title}>
-      <header className="flex items-center justify-between border-b border-border px-4 py-3">
-        <button type="button" onClick={onClose} aria-label="Close" className="text-text-secondary">✕</button>
+      <header className="flex items-center justify-between border-b border-border px-4 py-1.5">
+        <button type="button" onClick={onClose} aria-label="Close" className="-ml-2 flex h-11 w-11 items-center justify-center text-text-secondary">✕</button>
         <span className="font-medium">{title}</span>
-        <button type="button" onClick={() => onSave(draft)} className="font-medium text-text-accent">Done</button>
+        <button type="button" onClick={() => onSave(draft)} className="-mr-2 flex min-h-11 items-center px-2 font-medium text-text-accent">Done</button>
       </header>
 
       <div className="flex-1 overflow-y-auto px-4 py-3">
@@ -56,7 +56,7 @@ export function TaskEditorSheet({ open, initial, title = "Edit task", onClose, o
         </Row>
         <Row label="Part of day" htmlFor="ed-tod">
           <select id="ed-tod" className="bg-transparent text-sm"
-            value={draft.timeOfDay ?? ""} onChange={(e) => set("timeOfDay", (e.target.value || null) as TimeOfDay | null)}>
+            value={draft.timeOfDay ?? ""} onChange={(e) => set("timeOfDay", orNull(e.target.value) as TimeOfDay | null)}>
             <option value="">None</option>
             <option value="morning">Morning</option>
             <option value="afternoon">Afternoon</option>
@@ -82,7 +82,7 @@ export function TaskEditorSheet({ open, initial, title = "Edit task", onClose, o
         </div>
 
         {onDelete && (
-          <button type="button" onClick={onDelete} className="mt-5 text-sm text-text-danger">Delete task</button>
+          <button type="button" onClick={onDelete} className="mt-5 inline-flex min-h-11 items-center text-sm text-text-danger">Delete task</button>
         )}
       </div>
     </div>

@@ -41,4 +41,21 @@ describe("TaskEditorSheet", () => {
     await userEvent.click(screen.getByRole("button", { name: /^done$/i }));
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ tags: ["health"] }));
   });
+
+  it("clears a date field to null on empty input", async () => {
+    const onSave = vi.fn();
+    render(<TaskEditorSheet open initial={{ title: "t", doDate: "2026-07-20" }} onClose={vi.fn()} onSave={onSave} />);
+    await userEvent.clear(screen.getByLabelText(/^when$/i));
+    await userEvent.click(screen.getByRole("button", { name: /^done$/i }));
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ doDate: null }));
+  });
+
+  it("trims, lowercases, and dedupes tags via TagsInput", async () => {
+    const onSave = vi.fn();
+    render(<TaskEditorSheet open initial={{ title: "t", tags: ["work"] }} onClose={vi.fn()} onSave={onSave} />);
+    await userEvent.type(screen.getByLabelText(/add tag/i), "  Work  {enter}");
+    await userEvent.type(screen.getByLabelText(/add tag/i), "  Health {enter}");
+    await userEvent.click(screen.getByRole("button", { name: /^done$/i }));
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ tags: ["work", "health"] }));
+  });
 });
