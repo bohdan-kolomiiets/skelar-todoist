@@ -58,4 +58,30 @@ describe("useTasks", () => {
     });
     expect(result.current.tasks).toHaveLength(2);
   });
+
+  it("commits two mutations in the same tick without losing either (stale-closure regression)", () => {
+    const store = new MemoryTaskStore();
+    const { result } = renderHook(() => useTasks(), { wrapper: wrapper(store) });
+    act(() => {
+      result.current.addTask({ title: "a" });
+      result.current.addTask({ title: "b" });
+    });
+    expect(result.current.tasks.map((t) => t.title)).toEqual(["a", "b"]);
+    expect(store.load()).toHaveLength(2);
+  });
+
+  it("persists toggleComplete and moveTask to the store, not just React state", () => {
+    const store = new MemoryTaskStore();
+    const { result } = renderHook(() => useTasks(), { wrapper: wrapper(store) });
+    let id = "";
+    act(() => {
+      id = result.current.addTask({ title: "Persisted", doDate: "2026-07-20" }).id;
+    });
+
+    act(() => result.current.toggleComplete(id));
+    expect(store.load()[0].status).toBe("done");
+
+    act(() => result.current.moveTask(id, "inbox"));
+    expect(store.load()[0].doDate).toBeNull();
+  });
 });
