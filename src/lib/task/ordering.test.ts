@@ -20,6 +20,13 @@ describe("sortForToday", () => {
     const sorted = sortForToday([plain, highNoTime, evening, morning, timed]);
     expect(sorted.map((x) => x.id)).toEqual([timed.id, morning.id, evening.id, highNoTime.id, plain.id]);
   });
+
+  it("falls through to priority when exact times are equal", () => {
+    const lowPriorityAtNine = t({ time: "09:00", priority: "none", order: 0 });
+    const highPriorityAtNine = t({ time: "09:00", priority: "high", order: 1 });
+    const sorted = sortForToday([lowPriorityAtNine, highPriorityAtNine]);
+    expect(sorted.map((x) => x.id)).toEqual([highPriorityAtNine.id, lowPriorityAtNine.id]);
+  });
 });
 
 describe("groupToday", () => {
@@ -33,6 +40,13 @@ describe("groupToday", () => {
     expect(g.morning.map((x) => x.id)).toEqual([morningTimed.id]);
     expect(g.evening.map((x) => x.id)).toEqual([evening.id]);
     expect(g.anytime.map((x) => x.id)).toEqual([anytime.id]);
+  });
+
+  it("buckets afternoon tasks correctly by timeOfDay or exact time", () => {
+    const afternoonByTimeOfDay = t({ timeOfDay: "afternoon" });
+    const afternoonByTime = t({ time: "13:00" });
+    const g = groupToday([afternoonByTimeOfDay, afternoonByTime], TODAY);
+    expect(g.afternoon.map((x) => x.id)).toEqual([afternoonByTime.id, afternoonByTimeOfDay.id]);
   });
 });
 

@@ -7,7 +7,7 @@ const PRIORITY_RANK: Record<Task["priority"], number> = { high: 0, medium: 1, lo
 /** PRODUCT §7: exact time → timeOfDay bucket → priority → manual order. */
 export function sortForToday(tasks: Task[]): Task[] {
   return [...tasks].sort((a, b) => {
-    if (a.time && b.time) return a.time < b.time ? -1 : a.time > b.time ? 1 : 0;
+    if (a.time && b.time && a.time !== b.time) return a.time < b.time ? -1 : 1;
     if (a.time && !b.time) return -1;
     if (!a.time && b.time) return 1;
     const at = a.timeOfDay ? TOD_RANK[a.timeOfDay] : 3;
