@@ -26,4 +26,9 @@ describe("LocalTaskStore", () => {
     new LocalTaskStore("a").save([sample()]);
     expect(new LocalTaskStore("b").load()).toEqual([]);
   });
+
+  it("returns [] for valid JSON that is not an array", () => {
+    localStorage.setItem("planner.tasks.v1", "{}");
+    expect(new LocalTaskStore().load()).toEqual([]);
+  });
 });
