@@ -36,4 +36,22 @@ describe("TodayScreen", () => {
     await userEvent.click(screen.getByRole("button", { name: /complete/i }));
     expect(screen.getByText(/1 of 1 done/i)).toBeInTheDocument();
   });
+
+  it("shows inbox-aware empty state when nothing is planned but inbox has tasks", () => {
+    const inboxTask = createTask({ title: "x", doDate: null }, { id: "inbox", order: 0 });
+    renderWith([inboxTask]);
+    expect(screen.getByText(/pull from inbox/i)).toBeInTheDocument();
+  });
+
+  it("shows and hides completed tasks on toggle", async () => {
+    const today = todayISO();
+    const task = createTask({ title: "Done task", doDate: today }, { id: "c", order: 0 });
+    task.status = "done";
+    task.completedAt = today;
+    renderWith([task]);
+    expect(screen.queryByText("Done task")).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /show/i }));
+    expect(screen.getByText("Done task")).toBeInTheDocument();
+    expect(screen.getByText(/completed · 1/i)).toBeInTheDocument();
+  });
 });

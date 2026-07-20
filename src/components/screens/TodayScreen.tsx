@@ -5,6 +5,7 @@ import { useTasks } from "@/lib/tasks/useTasks";
 import { viewOf } from "@/lib/task/routing";
 import { groupToday } from "@/lib/task/ordering";
 import { todayISO } from "@/lib/date/clock";
+import { formatFullDate } from "@/lib/date/format";
 import type { Task, TaskDraft } from "@/lib/task/types";
 import { TaskRow } from "@/components/task/TaskRow";
 import { TaskEditorSheet } from "@/components/task/TaskEditorSheet";
@@ -24,8 +25,8 @@ export function TodayScreen() {
   const [showCompleted, setShowCompleted] = useState(false);
 
   const todays = useMemo(() => tasks.filter((t) => viewOf(t, today) === "today"), [tasks, today]);
-  const active = todays.filter((t) => t.status === "active");
-  const completed = todays.filter((t) => t.status === "done");
+  const active = useMemo(() => todays.filter((t) => t.status === "active"), [todays]);
+  const completed = useMemo(() => todays.filter((t) => t.status === "done"), [todays]);
   const groups = useMemo(() => groupToday(active, today), [active, today]);
   const hasInbox = tasks.some((t) => t.status === "active" && viewOf(t, today) === "inbox");
 
@@ -38,7 +39,7 @@ export function TodayScreen() {
       <header className="pb-2 pt-4">
         <h1 className="text-xl font-medium">Today</h1>
         <p className="mt-0.5 text-[13px] text-text-secondary">
-          {completed.length} of {todays.length} done
+          {formatFullDate(today)} · {completed.length} of {todays.length} done
         </p>
       </header>
 
@@ -59,7 +60,7 @@ export function TodayScreen() {
         )
       )}
 
-      <button type="button" onClick={() => setEditing("new")} className="mt-2 flex w-full items-center gap-2.5 py-3 text-left text-sm text-text-secondary">
+      <button type="button" onClick={() => setEditing("new")} className="mt-2 flex w-full items-center gap-2.5 min-h-11 py-3 text-left text-sm text-text-secondary">
         + Add task
       </button>
 

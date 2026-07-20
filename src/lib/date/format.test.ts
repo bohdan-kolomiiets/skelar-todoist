@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { deadlineBadge, formatDoDate } from "./format";
+import { deadlineBadge, formatDoDate, formatFullDate } from "./format";
 
 const TODAY = "2026-07-20"; // a Monday
 
@@ -30,5 +30,11 @@ describe("formatDoDate", () => {
   });
   it("labels a far date absolutely", () => {
     expect(formatDoDate("2026-08-15", TODAY)).toBe("Aug 15");
+  });
+});
+
+describe("formatFullDate", () => {
+  it("formats the date with full weekday name", () => {
+    expect(formatFullDate("2026-07-20")).toBe("Monday, Jul 20");
   });
 });

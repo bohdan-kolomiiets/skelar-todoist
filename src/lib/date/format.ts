@@ -1,5 +1,6 @@
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const WEEKDAYS_FULL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 /** Whole-day difference b - a, both "YYYY-MM-DD", via UTC to avoid DST drift. */
 function dayDiff(a: string, b: string): number {
@@ -39,4 +40,11 @@ export function formatDoDate(doDate: string, today: string): string {
     return WEEKDAYS[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
   }
   return absolute(doDate);
+}
+
+/** Header date label: "Monday, Jul 20" (PRODUCT §7 / today.html header). */
+export function formatFullDate(date: string): string {
+  const [y, m, d] = date.split("-").map(Number);
+  const weekday = WEEKDAYS_FULL[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
+  return `${weekday}, ${MONTHS[m - 1]} ${d}`;
 }
