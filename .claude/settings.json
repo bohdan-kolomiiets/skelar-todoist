@@ -14,7 +14,7 @@
     "vercel@claude-plugins-official": true,
     "figma@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true,
-    "serena@claude-plugins-official": true
+    "serena@claude-plugins-official": false
   },
   "permissions": {
     "allow": [

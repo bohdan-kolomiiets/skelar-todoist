@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review — edge cases</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.31.0/tabler-icons.min.css">
+<style>
+:root{
+--surface-2:#ffffff;--surface-1:#f4f2ec;--surface-0:#eceae3;
+--border:rgba(0,0,0,.10);--border-strong:rgba(0,0,0,.20);
+--text-primary:#2b2a27;--text-secondary:#5f5e5a;--text-muted:#8a8983;
+--text-accent:#185fa5;--fill-accent:#1f6fd0;--on-accent:#ffffff;
+--bg-warning:#faeeda;--text-warning:#854f0b;--border-warning:#e5c48f;
+--bg-danger:#fceceb;--text-danger:#a32d2d;--border-danger:#e6a6a4;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--text-primary);-webkit-font-smoothing:antialiased;display:flex;justify-content:center;padding:24px;background:var(--surface-0)}
+button{font-family:inherit;cursor:pointer}
+.phone{width:340px;background:var(--surface-2);border:0.5px solid var(--border);border-radius:22px;overflow:hidden;display:flex;flex-direction:column}
+.hdr{padding:14px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:10px}
+.body{padding:14px 14px 8px;display:flex;flex-direction:column;gap:10px;background:var(--surface-1)}
+.foot{padding:12px 16px 16px;border-top:0.5px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.rcard{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:11px 12px}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:3px 8px;border-radius:999px;border:0.5px solid var(--border);background:var(--surface-1);color:var(--text-secondary)}
+.place{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:5px 9px;border-radius:999px;border:0.5px solid var(--border-strong);background:var(--surface-1);color:var(--text-primary)}
+.rm{border:0;background:none;color:var(--text-muted);padding:2px;flex-shrink:0}
+.sec{font-size:13px;color:var(--text-secondary);margin:2px 2px 8px;font-weight:500}
+.ttl{margin:0;font-size:15px;font-weight:500;line-height:1.3;display:flex;align-items:center;gap:6px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.metas{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.add{width:100%;padding:13px;border:0;border-radius:12px;background:var(--fill-accent);color:var(--on-accent);font-size:16px;font-weight:500}
+.startover{align-self:center;border:0;background:none;color:var(--text-secondary);font-size:13px}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="hdr">
+    <button aria-label="Back" style="border:0;background:none;color:var(--text-secondary);padding:2px"><i class="ti ti-chevron-left" style="font-size:22px" aria-hidden="true"></i></button>
+    <div>
+      <p style="margin:0;font-size:16px;font-weight:500">Review your plan</p>
+      <p style="margin:0;font-size:12px;color:var(--text-secondary)">2 for today · 2 for later — tap a task to edit</p>
+    </div>
+  </div>
+
+  <div class="body">
+    <p class="sec"><i class="ti ti-sun" style="font-size:15px;vertical-align:-2px" aria-hidden="true"></i> Today · 2</p>
+
+    <div class="rcard">
+      <div class="top">
+        <p class="ttl"><i class="ti ti-flag" style="font-size:15px;color:var(--text-danger)" aria-hidden="true"></i>Finish the pitch deck</p>
+        <button class="rm" aria-label="Remove"><i class="ti ti-x" style="font-size:16px" aria-hidden="true"></i></button>
+      </div>
+      <div class="metas">
+        <span class="chip" style="background:var(--bg-warning);color:var(--text-warning);border-color:var(--border-warning)"><i class="ti ti-clock" style="font-size:13px" aria-hidden="true"></i>due Fri</span>
+        <span class="chip">work</span>
+      </div>
+      <div style="margin-top:10px"><button class="place"><i class="ti ti-sun" style="font-size:14px" aria-hidden="true"></i>Today<i class="ti ti-chevron-down" style="font-size:14px;color:var(--text-muted)" aria-hidden="true"></i></button></div>
+    </div>
+
+    <div class="rcard">
+      <div class="top">
+        <p class="ttl"><i class="ti ti-flag" style="font-size:15px;color:var(--text-danger)" aria-hidden="true"></i>Reply to Anna</p>
+        <button class="rm" aria-label="Remove"><i class="ti ti-x" style="font-size:16px" aria-hidden="true"></i></button>
+      </div>
+      <div style="margin-top:10px"><button class="place"><i class="ti ti-sun" style="font-size:14px" aria-hidden="true"></i>Today<i class="ti ti-chevron-down" style="font-size:14px;color:var(--text-muted)" aria-hidden="true"></i></button></div>
+    </div>
+
+    <p class="sec" style="margin-top:6px"><i class="ti ti-inbox" style="font-size:15px;vertical-align:-2px" aria-hidden="true"></i> Inbox · 2</p>
+
+    <div class="rcard">
+      <div class="top">
+        <p class="ttl">Book the dentist</p>
+        <button class="rm" aria-label="Remove"><i class="ti ti-x" style="font-size:16px" aria-hidden="true"></i></button>
+      </div>
+      <div class="metas">
+        <span class="chip"><i class="ti ti-calendar" style="font-size:13px" aria-hidden="true"></i>Fri</span>
+      </div>
+      <div style="margin-top:10px"><button class="place"><i class="ti ti-inbox" style="font-size:14px" aria-hidden="true"></i>Inbox<i class="ti ti-chevron-down" style="font-size:14px;color:var(--text-muted)" aria-hidden="true"></i></button></div>
+    </div>
+
+    <div class="rcard">
+      <div class="top">
+        <p class="ttl">Call the plumber</p>
+        <button class="rm" aria-label="Remove"><i class="ti ti-x" style="font-size:16px" aria-hidden="true"></i></button>
+      </div>
+      <div class="metas">
+        <span class="chip" style="background:var(--bg-danger);color:var(--text-danger);border-color:var(--border-danger)"><i class="ti ti-alert-triangle" style="font-size:13px" aria-hidden="true"></i>needs a date</span>
+        <span class="chip" style="border-style:dashed;color:var(--text-muted)">"sometime next week"</span>
+      </div>
+      <div style="margin-top:10px"><button class="place"><i class="ti ti-inbox" style="font-size:14px" aria-hidden="true"></i>Inbox<i class="ti ti-chevron-down" style="font-size:14px;color:var(--text-muted)" aria-hidden="true"></i></button></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <button class="add">Add 4 tasks</button>
+    <button class="startover">Start over</button>
+  </div>
+</div>
+</body>
+</html>

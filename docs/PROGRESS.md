@@ -3,11 +3,13 @@
 > Living status for the project. **Update at the end of each working session** —
 > move items from Next → Done, record new decisions, note the next concrete step.
 >
-> Last updated: 2026-07-19
+> Last updated: 2026-07-20
 
 ## Current phase
-Phase 0 (infrastructure) **complete** — including live deploy, local secrets, and
-the CI/CD test gate. Next: Phase 1 (product spec / brainstorm).
+Phase 1 (product spec / brainstorm) **complete** — [PRODUCT.md](./PRODUCT.md) is fully
+groomed (Task schema + AI contract, all core screens, access / onboarding / freemium), with
+low-fi mockups in [mockups/](./mockups/) and every open decision closed. Next: write the
+implementation plan, then Phase 2 (build the core flow end-to-end, TDD).
 
 ## Done
 - [x] Git repo on `main`; GitHub remote (`github.com:bohdan-kolomiiets/skelar-todoist`)
@@ -33,13 +35,24 @@ the CI/CD test gate. Next: Phase 1 (product spec / brainstorm).
 - [x] Branch protection on `main`: PRs required (no direct pushes, no force
   push, no deletion), `test` CI check required, 0 mandatory reviewers (solo
   project)
+- [x] **Phase 1 — product spec brainstormed** ([PRODUCT.md](./PRODUCT.md)): locked the
+  `Task` schema (UI↔AI contract), Today-vs-Inbox routing, priority (default-off), deadline
+  badge, ordering, tags, the Capture → Review → Save flow + add-model + parse rules, empty
+  states, completion model, and the **access / onboarding / freemium** design (3-rung
+  ladder, Edge Config `freeDailyInputs`, voice fake-door + waitlist). §18 (open decisions)
+  is empty.
+- [x] **All core-screen layouts mocked** in [docs/mockups/](./mockups/) — Capture (+ voice
+  sheets), Review (+ edge cases), task editor, New-task entry, Today, Inbox, empty states.
+  Mobile-first, borderless **pill** tab bar. Welcome / Plans / Settings specified (§12/§14),
+  mockups optional.
 
 ## Next (in order)
-1. **Phase 1 — brainstorm `docs/PRODUCT.md`.** Lock the `Task` data schema (the
-   core UI↔AI contract) and the Capture / Inbox / Today screens. Use the
-   brainstorming skill. Do this *before* feature code.
-2. **Phase 2 — build the core flow end-to-end** (Capture → AI parse → tasks →
-   Today), TDD, one vertical slice at a time.
+1. **Write the implementation plan** from [PRODUCT.md](./PRODUCT.md) (use the
+   writing-plans skill) — sequence the vertical slices before touching code.
+2. **Phase 2 — build the core flow end-to-end** (Capture → AI parse → Review → Today),
+   TDD, one vertical slice at a time. Suggested order: `Task` model + swappable storage
+   interface → mock-LLM parse boundary (`/api/organize`) → Capture/Review → Today/Inbox →
+   editor → auth/freemium shell.
 
 ## Open decisions
 - **(Optional, low priority) Mock-AI fallback for local dev.** Once the AI route
@@ -63,3 +76,7 @@ the CI/CD test gate. Next: Phase 1 (product spec / brainstorm).
   project; A→B migration stays cheap later if needed.
 - Package manager for global CLI tools: **pnpm** (project deps still use npm,
   per `package-lock.json`).
+- **Product decisions live in [PRODUCT.md](./PRODUCT.md)** — the groomed spec is the source
+  of truth for the Task schema, screens, routing, priority, freemium, and onboarding.
+- **Edge Config** created + linked in Vercel with key `freeDailyInputs = 3` (free daily AI
+  limit; runtime-tunable without redeploy, fallback constant `3`).

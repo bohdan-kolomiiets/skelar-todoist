@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capture — first run</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.31.0/tabler-icons.min.css">
+<style>
+:root{
+--surface-2:#ffffff;--surface-1:#f4f2ec;--surface-0:#eceae3;
+--border:rgba(0,0,0,.10);--border-strong:rgba(0,0,0,.20);
+--text-primary:#2b2a27;--text-secondary:#5f5e5a;--text-muted:#8a8983;--text-disabled:#b7b5ac;
+--text-accent:#185fa5;--fill-accent:#1f6fd0;--on-accent:#ffffff;--bg-accent:#e6f1fb;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface-0);color:var(--text-primary);-webkit-font-smoothing:antialiased;display:flex;justify-content:center;padding:24px}
+button{font-family:inherit;cursor:pointer}
+.phone{width:340px;background:var(--surface-2);border:0.5px solid var(--border);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;min-height:600px}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:0.5px solid var(--border)}
+.main{flex:1;display:flex;flex-direction:column;padding:16px;gap:10px}
+.field{position:relative;flex:1;display:flex;flex-direction:column;border:0.5px solid var(--border);border-radius:12px;background:var(--surface-1);padding:10px 12px}
+.corner{position:absolute;top:8px;right:8px;display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:4px 9px;border:0.5px solid var(--border-strong);border-radius:999px;background:var(--surface-2);color:var(--text-primary)}
+.ta{flex:1;min-height:180px;resize:none;width:100%;font-family:inherit;font-size:16px;line-height:1.6;padding:22px 0 0;border:0;background:transparent;color:var(--text-primary)}
+.ta::placeholder{color:var(--text-muted)}
+.arow{display:flex;align-items:center;justify-content:space-between;padding-top:8px;margin-top:2px;border-top:0.5px solid var(--border)}
+.tips{display:inline-flex;align-items:center;gap:5px;border:0;background:none;color:var(--text-secondary);font-size:13px}
+.mic{border:0;background:none;color:var(--text-disabled);display:inline-flex;align-items:center;padding:2px}
+.planit{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border:0;border-radius:999px;background:var(--fill-accent);color:var(--on-accent);font-size:15px;font-weight:500}
+.tip{margin:0;font-size:13px;color:var(--text-secondary)}
+.tabs{display:flex;border-top:0.5px solid var(--border);padding:2px 4px 6px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;font-size:11px;color:var(--text-muted);background:none;border:0}
+.tab i{font-size:20px}.tab.on{color:var(--text-accent)}
+.sq{display:flex;align-items:center;justify-content:center;width:46px;height:30px;border-radius:11px;background:var(--bg-accent)}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="hdr">
+    <span style="font-size:16px;font-weight:500">Your AI Planner</span>
+    <button aria-label="Settings" style="border:0;background:none;color:var(--text-secondary);padding:4px"><i class="ti ti-settings" style="font-size:20px" aria-hidden="true"></i></button>
+  </div>
+
+  <div class="main">
+    <div class="field">
+      <button class="corner"><i class="ti ti-wand" style="font-size:15px;color:var(--text-accent)" aria-hidden="true"></i>Try an example</button>
+      <textarea class="ta" placeholder="What's on your mind?&#10;&#10;Get everything out of your head — tasks, errands, deadlines. I'll sort it into your day."></textarea>
+      <div class="arow">
+        <button class="tips"><i class="ti ti-help-circle" style="font-size:17px" aria-hidden="true"></i>Tips</button>
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="mic" aria-label="Voice input, coming soon"><i class="ti ti-microphone" style="font-size:20px" aria-hidden="true"></i></button>
+          <button class="planit">Plan it<i class="ti ti-arrow-right" style="font-size:17px" aria-hidden="true"></i></button>
+        </div>
+      </div>
+    </div>
+    <p class="tip">Tip: say <em>when</em> — "today", "tomorrow 3pm", "gym this evening", "report due Fri".</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on"><span class="sq"><i class="ti ti-bulb" aria-hidden="true"></i></span>Capture</button>
+    <button class="tab"><i class="ti ti-sun" aria-hidden="true"></i>Today</button>
+    <button class="tab"><i class="ti ti-inbox" aria-hidden="true"></i>Inbox</button>
+  </div>
+
+</div>
+</body>
+</html>
