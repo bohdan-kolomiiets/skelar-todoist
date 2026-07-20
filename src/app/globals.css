@@ -12,6 +12,29 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Planner design tokens — locked low-fi palette (docs/mockups/*.html). */
+@theme {
+  --color-surface-0: #eceae3;
+  --color-surface-1: #f4f2ec;
+  --color-surface-2: #ffffff;
+  --color-border: rgba(0, 0, 0, 0.1);
+  --color-border-strong: rgba(0, 0, 0, 0.2);
+  --color-text-primary: #2b2a27;
+  --color-text-secondary: #5f5e5a;
+  --color-text-muted: #8a8983;
+  --color-text-disabled: #b7b5ac;
+  --color-text-accent: #185fa5;
+  --color-fill-accent: #1f6fd0;
+  --color-on-accent: #ffffff;
+  --color-bg-accent: #e6f1fb;
+  --color-bg-warning: #faeeda;
+  --color-text-warning: #854f0b;
+  --color-border-warning: #e5c48f;
+  --color-bg-danger: #fceceb;
+  --color-text-danger: #a32d2d;
+  --color-border-danger: #e6a6a4;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
