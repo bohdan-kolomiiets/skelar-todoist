@@ -52,6 +52,11 @@ describe("CaptureFlow", () => {
     expect(screen.getByRole("button", { name: /try an example/i })).toBeInTheDocument();
   });
 
+  it("shows a Settings gear linking to /settings", () => {
+    renderCapture();
+    expect(screen.getByRole("link", { name: /settings/i })).toHaveAttribute("href", "/settings");
+  });
+
   it("shows a wand icon on the example chip, not an emoji (issue #4 #7)", () => {
     renderCapture();
     const chip = screen.getByRole("button", { name: /try an example/i });

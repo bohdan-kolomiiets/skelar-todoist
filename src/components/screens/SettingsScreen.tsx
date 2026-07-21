@@ -27,7 +27,7 @@ export function SettingsScreen() {
           <p className="text-xs text-text-muted">Account</p>
           <p className="mt-0.5">{account}</p>
         </div>
-        <Link href="/plans" className="flex min-h-11 items-center justify-between px-4 py-3" aria-label="Plan">
+        <Link href="/plans" className="flex min-h-11 items-center justify-between px-4 py-3">
           <span>Plan</span>
           <span className="flex items-center gap-1 text-text-secondary">
             {isPro ? "Pro" : "Free"}

@@ -32,6 +32,11 @@ describe("InboxScreen", () => {
     expect(screen.getByText(/inbox zero/i)).toBeInTheDocument();
   });
 
+  it("shows a Settings gear linking to /settings", () => {
+    renderWith();
+    expect(screen.getByRole("link", { name: /settings/i })).toHaveAttribute("href", "/settings");
+  });
+
   it("splits scheduled and someday tasks", () => {
     const tasks = [
       createTask({ title: "Learn guitar", doDate: null }, { id: "s1", order: 1 }),
