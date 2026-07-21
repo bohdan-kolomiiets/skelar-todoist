@@ -64,6 +64,7 @@ export class LocalAuthService implements AuthService {
   }
 
   signIn(input: { emailOrName: string }): Profile {
+    this.migrateLegacyIfNeeded();
     const reg = this.read() ?? { activeId: null, profiles: {} };
     const from = reg.activeId ? reg.profiles[reg.activeId] : this.startGuestInto(reg);
     const isEmail = input.emailOrName.includes("@");

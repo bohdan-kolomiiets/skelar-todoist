@@ -85,4 +85,32 @@ describe("LocalAuthService", () => {
     expect(auth.current()).toBeNull();
     expect(localStorage.getItem("planner.profiles.v1")).toBeNull();
   });
+
+  it("carries guest flags forward to the signed-in profile", () => {
+    const auth = new LocalAuthService();
+    auth.startGuest();
+    auth.markOrganized();
+    const user = auth.signIn({ emailOrName: "sam@example.com" });
+    expect(user.hasOrganizedOnce).toBe(true);
+    expect(new LocalAuthService().current()?.hasOrganizedOnce).toBe(true);
+  });
+
+  it("adopts legacy data idempotently (does not duplicate/overwrite on re-read)", () => {
+    localStorage.setItem(TASKS_KEY, JSON.stringify([{ id: "legacy", title: "Old" }]));
+    const auth = new LocalAuthService();
+    const p1 = auth.current();
+    const p2 = new LocalAuthService().current();
+    expect(p1?.id).toBe("guest");
+    expect(p2?.id).toBe("guest");
+    const guestBucket = localStorage.getItem(guestTasksKey);
+    expect(guestBucket).toContain("Old");
+    // Verify exactly one copy (parsing and counting "Old" to ensure no duplication)
+    expect(JSON.parse(guestBucket!).filter((t: { title: string }) => t.title === "Old")).toHaveLength(1);
+  });
+
+  it("tolerates corrupt registry JSON and returns null", () => {
+    localStorage.setItem("planner.profiles.v1", "{not json");
+    const auth = new LocalAuthService();
+    expect(auth.current()).toBeNull();
+  });
 });
