@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { IconWand, IconHelpCircle, IconMicrophone, IconArrowRight } from "@tabler/icons-react";
+import { DaysparkWordmark } from "@/components/brand/DaysparkWordmark";
 import { TipsSheet } from "@/components/capture/TipsSheet";
 import { VoiceComingSoonSheet } from "@/components/capture/VoiceComingSoonSheet";
 import { organize } from "@/lib/ai/organizeClient";
@@ -60,6 +61,9 @@ export function CaptureFlow() {
 
   return (
     <section className="flex flex-1 flex-col gap-2.5 px-4 py-4">
+      <header className="flex items-center pb-1">
+        <DaysparkWordmark />
+      </header>
       <div className="flex flex-1 flex-col rounded-xl border border-border bg-surface-1 p-3">
         {/* Chip in a normal-flow row (issue #4 #7) so it can never overlap the typed
             text — the old absolute+min-h-11 chip did. Wand icon per the mockup. */}

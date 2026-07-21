@@ -115,4 +115,10 @@ describe("CaptureFlow", () => {
     expect(screen.getByRole("button", { name: /plan it/i })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /add \d+ tasks?/i })).not.toBeInTheDocument();
   });
+
+  it("shows the Dayspark wordmark header", () => {
+    renderFlow();
+    expect(screen.getByText("Day")).toBeInTheDocument();
+    expect(screen.getByText("spark")).toBeInTheDocument();
+  });
 });
