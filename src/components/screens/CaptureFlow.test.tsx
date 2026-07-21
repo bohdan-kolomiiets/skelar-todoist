@@ -11,6 +11,7 @@ vi.mock("@/lib/ai/organizeClient", () => ({
       { title: "Read design book", doDate: null },
     ],
     degraded: false,
+    freeDailyInputs: 3,
   }),
 }));
 
@@ -21,10 +22,11 @@ import { MemoryTaskStore } from "@/lib/storage/MemoryTaskStore";
 import { AuthProvider } from "@/lib/auth/AuthProvider";
 import { LocalAuthService } from "@/lib/auth/LocalAuthService";
 import { SaveNudgeProvider } from "@/lib/nudge/SaveNudgeProvider";
+import { profileKey } from "@/lib/profile/profileKey";
+import { USAGE_KEY } from "@/lib/usage/LocalUsageService";
+import { todayISO } from "@/lib/date/clock";
 
-function renderCapture() {
-  const service = new LocalAuthService();
-  service.startGuest();
+function renderCaptureWith(service: LocalAuthService) {
   return render(
     <AuthProvider service={service}>
       <SaveNudgeProvider>
@@ -34,6 +36,12 @@ function renderCapture() {
       </SaveNudgeProvider>
     </AuthProvider>,
   );
+}
+
+function renderCapture() {
+  const service = new LocalAuthService();
+  service.startGuest();
+  return renderCaptureWith(service);
 }
 
 describe("CaptureFlow", () => {
@@ -155,5 +163,20 @@ describe("CaptureFlow", () => {
       </AuthProvider>,
     );
     expect(screen.queryByRole("button", { name: /try an example/i })).not.toBeInTheDocument();
+  });
+
+  it("blocks Plan it with the limit sheet when a non-Pro user is out of inputs", async () => {
+    localStorage.clear();
+    const service = new LocalAuthService();
+    const guest = service.startGuest();
+    // Pre-exhaust today's usage for this profile (default limit 3).
+    // Use the same local-date source as CaptureFlow (todayISO), not UTC — near
+    // local midnight, `new Date().toISOString()` disagrees with the app's local date.
+    const today = todayISO();
+    localStorage.setItem(profileKey(USAGE_KEY, guest.id), JSON.stringify({ date: today, count: 3 }));
+    renderCaptureWith(service);
+    await userEvent.type(screen.getByLabelText(/brain dump/i), "something");
+    await userEvent.click(screen.getByRole("button", { name: /plan it/i }));
+    expect(await screen.findByText(/out of ai plans for today/i)).toBeInTheDocument();
   });
 });

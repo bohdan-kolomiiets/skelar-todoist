@@ -1,15 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { IconWand, IconHelpCircle, IconMicrophone, IconSparkles } from "@tabler/icons-react";
 import { DaysparkWordmark } from "@/components/brand/DaysparkWordmark";
 import { TipsSheet } from "@/components/capture/TipsSheet";
 import { VoiceComingSoonSheet } from "@/components/capture/VoiceComingSoonSheet";
+import { LimitReachedSheet } from "@/components/billing/LimitReachedSheet";
 import { organize } from "@/lib/ai/organizeClient";
 import { useTasks } from "@/lib/tasks/useTasks";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useSaveNudge } from "@/lib/nudge/useSaveNudge";
+import { LocalUsageService, USAGE_KEY } from "@/lib/usage/LocalUsageService";
+import { profileKey } from "@/lib/profile/profileKey";
+import { todayISO } from "@/lib/date/clock";
 import type { ParsedTask } from "@/lib/task/types";
 import { ReviewScreen } from "./ReviewScreen";
 
@@ -21,7 +25,7 @@ const PLACEHOLDER =
 export function CaptureFlow() {
   const router = useRouter();
   const { addTasks } = useTasks();
-  const { profile, markOrganized } = useAuth();
+  const { profile, isPro, markOrganized } = useAuth();
   const { notifySaved } = useSaveNudge();
   const [text, setText] = useState("");
   const [proposal, setProposal] = useState<ParsedTask[] | null>(null);
@@ -32,11 +36,31 @@ export function CaptureFlow() {
   const [voiceOpen, setVoiceOpen] = useState(false);
   const firstRun = profile?.hasOrganizedOnce !== true;
 
+  const today = todayISO();
+  const usage = useMemo(
+    () => new LocalUsageService(profileKey(USAGE_KEY, profile?.id ?? "guest")),
+    [profile?.id],
+  );
+  const [limit, setLimit] = useState(3); // freeDailyInputs; updated from the organize response
+  const [used, setUsed] = useState(0); // today's count, for the "N left" display + limit sheet
+  const [limitOpen, setLimitOpen] = useState(false);
+  const usedToday = usage.count(today);
+
   async function planIt() {
+    if (!isPro && usage.remaining(today, limit) <= 0) {
+      setUsed(usage.count(today));
+      setLimitOpen(true);
+      return; // non-blocking: no parse runs
+    }
     setBusy(true);
     setError(null);
     try {
-      const { tasks, degraded } = await organize(text);
+      const { tasks, degraded, freeDailyInputs } = await organize(text);
+      setLimit(freeDailyInputs);
+      if (!isPro) {
+        usage.increment(today);
+        setUsed(usage.count(today));
+      }
       if (tasks.length > 0) markOrganized();
       setDegraded(degraded);
       setProposal(tasks);
@@ -119,6 +143,11 @@ export function CaptureFlow() {
         </div>
       </div>
       {error && <p className="text-[13px] text-text-danger">{error}</p>}
+      {!isPro && (
+        <p className="text-[13px] text-text-muted">
+          {Math.max(0, limit - usedToday)} of {limit} AI plans left today
+        </p>
+      )}
       {firstRun && (
         <p className="text-[13px] text-text-secondary">
           Tip: say <em>when</em> — “today”, “tomorrow 3pm”, “gym this evening”, “report due Fri”.
@@ -126,6 +155,7 @@ export function CaptureFlow() {
       )}
       <TipsSheet open={tipsOpen} onClose={() => setTipsOpen(false)} />
       <VoiceComingSoonSheet open={voiceOpen} onClose={() => setVoiceOpen(false)} />
+      <LimitReachedSheet open={limitOpen} onClose={() => setLimitOpen(false)} used={used} limit={limit} />
     </section>
   );
 }
