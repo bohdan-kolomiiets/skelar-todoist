@@ -17,6 +17,7 @@ export function CaptureFlow() {
   const { addTasks } = useTasks();
   const [text, setText] = useState("");
   const [proposal, setProposal] = useState<ParsedTask[] | null>(null);
+  const [degraded, setDegraded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +25,9 @@ export function CaptureFlow() {
     setBusy(true);
     setError(null);
     try {
-      setProposal(await organize(text));
+      const { tasks, degraded } = await organize(text);
+      setDegraded(degraded);
+      setProposal(tasks);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -36,12 +39,14 @@ export function CaptureFlow() {
     return (
       <ReviewScreen
         proposal={proposal}
+        degraded={degraded}
         onCommit={(tasks) => {
           addTasks(tasks);
           router.push("/today");
         }}
         onStartOver={() => {
           setProposal(null);
+          setDegraded(false);
           setText("");
         }}
       />

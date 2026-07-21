@@ -105,12 +105,22 @@ auto-deploys), then set Edge Config `aiMode = "real"` for production; then Miles
   of truth for the Task schema, screens, routing, priority, freemium, and onboarding.
 - **Edge Config** created + linked in Vercel with key `freeDailyInputs = 3` (free daily AI
   limit; runtime-tunable without redeploy, fallback constant `3`).
-- **AI integration: Vercel AI SDK (`ai`) + AI Gateway**, model `anthropic/claude-haiku-4.5`,
+- **AI integration: Vercel AI SDK (`ai`) + AI Gateway**, model **`openai/gpt-4o-mini`**,
   structured output enforced by a `zod` contract schema. Behind a `TaskParser` interface.
   **Gateway is Vercel-managed (OIDC auth)** — zero token markup, $5/mo free credits, no
   provider key to manage; auth via `VERCEL_OIDC_TOKEN` (`vercel env pull` locally, automatic
   on deploys). The earlier `AI_API_KEY` is **no longer used** for parsing (candidate to retire).
-  Haiku ≈ $1/M in, $5/M out → ~0.2¢ per brain-dump parse.
+  - **Model switched from `anthropic/claude-haiku-4.5` → `openai/gpt-4o-mini`** (issue #4 P1):
+    Haiku is gated on the Gateway **free tier** (`403 RestrictedModelsError`); gpt-4o-mini is
+    available. gpt-4o-mini's **strict** structured outputs reject optional keys, so the model
+    output uses a required-but-nullable schema (`modelTaskSchema`) distinct from the lenient
+    validation schema; `createTask` normalizes the nulls with `??`. **Note:** the free tier also
+    **rate-limits** gpt-4o-mini under bursts (`GatewayRateLimitError`) — fine for single-user
+    demo taps, and covered by the fallback below regardless.
+  - **Resilience (issue #4 P1):** if the real parser fails for any reason (gateway/model/
+    rate-limit/timeout), `/api/organize` **falls back to `FakeTaskParser`** and returns
+    `{ tasks, degraded: true }`; the Review screen shows an honest "AI temporarily unavailable —
+    organized with a basic parser" notice instead of the old misleading 502 "Try rephrasing".
 - **Dual-mode parsing via Edge Config `aiMode` (`fake`|`real`)** — a deterministic rule-based
   `FakeTaskParser` (local dev, tests, and an instant grading fallback) vs the real
   `GatewayTaskParser`. Resolution: Edge Config `aiMode` → env `AI_MODE` → default `fake`;

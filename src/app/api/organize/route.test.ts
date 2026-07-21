@@ -22,6 +22,7 @@ describe("POST /api/organize", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.tasks[0].timeOfDay).toBe("evening");
+    expect(json.degraded).toBe(false); // fake mode is the intended path, not a degradation
   });
 
   it("400s on empty text", async () => {

@@ -5,10 +5,13 @@ import userEvent from "@testing-library/user-event";
 const push = vi.fn();
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push, replace: push }) }));
 vi.mock("@/lib/ai/organizeClient", () => ({
-  organize: vi.fn().mockResolvedValue([
-    { title: "Gym", doDate: null, timeOfDay: "evening" },
-    { title: "Read design book", doDate: null },
-  ]),
+  organize: vi.fn().mockResolvedValue({
+    tasks: [
+      { title: "Gym", doDate: null, timeOfDay: "evening" },
+      { title: "Read design book", doDate: null },
+    ],
+    degraded: false,
+  }),
 }));
 
 import { CaptureFlow } from "./CaptureFlow";
@@ -35,6 +38,22 @@ describe("CaptureFlow", () => {
     await userEvent.type(screen.getByPlaceholderText(/what's on your mind/i), "Gym this evening. Read design book.");
     await userEvent.click(screen.getByRole("button", { name: /plan it/i }));
     expect(await screen.findByRole("button", { name: /add 2 tasks/i })).toBeInTheDocument();
+    // Normal AI path: no "temporarily unavailable" notice.
+    expect(screen.queryByText(/temporarily unavailable/i)).not.toBeInTheDocument();
+  });
+
+  it("shows an honest notice in Review when the server fell back to the basic parser", async () => {
+    vi.mocked(organize).mockResolvedValueOnce({
+      tasks: [{ title: "Gym", doDate: null, timeOfDay: "evening" }],
+      degraded: true,
+    });
+    renderFlow();
+    await userEvent.type(screen.getByPlaceholderText(/what's on your mind/i), "Gym this evening.");
+    await userEvent.click(screen.getByRole("button", { name: /plan it/i }));
+    // Still lands in Review with a usable plan…
+    expect(await screen.findByRole("button", { name: /add 1 task/i })).toBeInTheDocument();
+    // …plus an honest, non-blocking notice that the real AI was unavailable.
+    expect(screen.getByText(/temporarily unavailable/i)).toBeInTheDocument();
   });
 
   it("disables Plan it while the field is empty", () => {
