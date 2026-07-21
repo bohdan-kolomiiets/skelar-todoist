@@ -64,6 +64,13 @@ shared `BottomSheet`. Verified: unit **147**, e2e **4/4**, lint+typecheck clean.
   existing danger tokens); card ✕ gained a per-task a11y name. Scoped to Review as asked; the
   editor's "Delete task" (Today/Inbox, *saved* tasks) is a noted follow-up. Sweep green:
   unit **154**, e2e **4/4**, lint+typecheck clean; manually verified in-browser.
+- [x] **Review: show a scheduled task's do-date on its card** (PR #11, branch `fix/review-do-date`).
+  A future do-date (e.g. "grab delivery in 3 days in the morning") was parsed and stored — it
+  showed in the editor's "When" — but the Review card only drew `timeOfDay`/`tags`, so you
+  couldn't see *when* a task was scheduled without opening it. Now renders a `formatDoDate` chip
+  for a set, non-today do-date (today's tasks sit under the "☀ Today" header, so no redundant
+  chip), matching how the committed Inbox surfaces scheduled dates. New regression test; sweep
+  green: unit **155**, e2e **4/4**, lint+typecheck clean; verified in-browser.
 - [x] **Phase 2 — core flow implemented** (subagent-driven TDD, branch `feat/core-flow`, 31
   commits). Milestone A: Task model + `createTask`, injectable clock + deadline/do-date
   formatting, Today/Inbox routing + ordering/grouping, swappable `TaskStore`
