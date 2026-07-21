@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { IconWand } from "@tabler/icons-react";
 import { organize } from "@/lib/ai/organizeClient";
 import { useTasks } from "@/lib/tasks/useTasks";
 import type { ParsedTask } from "@/lib/task/types";
@@ -55,20 +56,25 @@ export function CaptureFlow() {
 
   return (
     <section className="flex flex-1 flex-col gap-2.5 px-4 py-4">
-      <div className="relative flex flex-1 flex-col rounded-xl border border-border bg-surface-1 p-3">
-        <button
-          type="button"
-          onClick={() => setText(EXAMPLE_DUMP)}
-          className="absolute right-2 top-2 min-h-11 rounded-full border border-border-strong bg-surface-2 px-2.5 py-1 text-xs"
-        >
-          ✨ Try an example
-        </button>
+      <div className="flex flex-1 flex-col rounded-xl border border-border bg-surface-1 p-3">
+        {/* Chip in a normal-flow row (issue #4 #7) so it can never overlap the typed
+            text — the old absolute+min-h-11 chip did. Wand icon per the mockup. */}
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => setText(EXAMPLE_DUMP)}
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-border-strong bg-surface-2 px-2.5 py-1 text-xs"
+          >
+            <IconWand size={15} className="text-text-accent" aria-hidden />
+            Try an example
+          </button>
+        </div>
         <textarea
           aria-label="Brain dump"
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder={PLACEHOLDER}
-          className="mt-8 min-h-44 flex-1 resize-none bg-transparent text-base leading-relaxed outline-none placeholder:text-text-muted"
+          className="mt-1 min-h-44 flex-1 resize-none bg-transparent text-base leading-relaxed outline-none placeholder:text-text-muted"
         />
         <div className="mt-1 flex items-center justify-between border-t border-border pt-2">
           <button type="button" className="min-h-11 text-[13px] text-text-secondary">Tips</button>

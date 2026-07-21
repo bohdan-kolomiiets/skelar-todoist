@@ -33,6 +33,14 @@ describe("CaptureFlow", () => {
     expect(screen.getByRole("button", { name: /try an example/i })).toBeInTheDocument();
   });
 
+  it("shows a wand icon on the example chip, not an emoji (issue #4 #7)", () => {
+    renderFlow();
+    const chip = screen.getByRole("button", { name: /try an example/i });
+    const icon = chip.querySelector("svg");
+    expect(icon).toBeInTheDocument();
+    expect(icon).toHaveAttribute("aria-hidden", "true");
+  });
+
   it("parses a dump and transitions to Review", async () => {
     renderFlow();
     await userEvent.type(screen.getByPlaceholderText(/what's on your mind/i), "Gym this evening. Read design book.");
