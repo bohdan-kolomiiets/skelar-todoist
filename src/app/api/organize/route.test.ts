@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 
 // gatewayParser imports "server-only" transitively; it throws under jsdom otherwise.
 vi.mock("server-only", () => ({}));
@@ -7,6 +7,10 @@ vi.mock("server-only", () => ({}));
 vi.mock("@/lib/ai/mode", () => ({ resolveAiMode: () => Promise.resolve("fake") }));
 
 import { POST } from "./route";
+
+// The route logs the resolved aiMode on every call — silence it so test output stays clean.
+const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+afterEach(() => logSpy.mockClear());
 
 function req(body: unknown) {
   return new Request("http://test/api/organize", { method: "POST", body: JSON.stringify(body) });
@@ -33,5 +37,10 @@ describe("POST /api/organize", () => {
   it("400s on an invalid JSON body", async () => {
     const res = await POST(new Request("http://test/api/organize", { method: "POST", body: "not json" }));
     expect(res.status).toBe(400);
+  });
+
+  it("logs the AI mode used to parse", async () => {
+    await POST(req({ text: "Gym this evening" }));
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining("aiMode=fake"));
   });
 });
