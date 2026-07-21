@@ -2,6 +2,13 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **⚠️ PIVOT (2026-07-21, executed):** Task 4's decisive eval revealed gateway BYOK is a
+> **paid-tier feature** (0/5 on the free tier: "BYOK is available only with paid credits").
+> Tasks 1 & 3 (the `aiModel` knob + route wiring) landed as written; **Task 2's BYOK parser was
+> replaced** by routing `anthropic/*` through the **direct `@ai-sdk/anthropic` SDK** (the
+> constructor dep is `apiKey`, not `byokKey`). Verified: eval 5/5 anthropic-direct + 5/5
+> gpt-4o-mini-gateway. Treat the `providerOptions.gateway.byok` code in Task 2 as superseded.
+
 **Goal:** Make the real-mode parser run on a runtime-selectable gateway model, and route `anthropic/*` on the user's own paid Anthropic account via request-scoped BYOK — so we bypass the free-tier 403 and rate limits.
 
 **Architecture:** Two Edge Config knobs — `aiMode` (`fake`|`real`, unchanged) and a new `aiModel` (gateway slug). In real mode the route resolves `aiModel` and constructs `GatewayTaskParser({ model, byokKey: process.env.AI_API_KEY })`. The parser passes the key as `providerOptions.gateway.byok.anthropic`; the gateway applies it only to `anthropic/*` routing. The P1 fake-fallback + `degraded` UX is untouched, so a missing/invalid key degrades honestly.

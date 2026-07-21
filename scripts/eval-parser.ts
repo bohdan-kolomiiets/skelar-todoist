@@ -19,8 +19,8 @@ const DELAY_MS = Number(process.env.EVAL_DELAY_MS ?? 8000);
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function main() {
-  const model = process.env.EVAL_MODEL; // e.g. anthropic/claude-haiku-4.5 (BYOK) — undefined uses the default
-  const parser = new GatewayTaskParser({ today: TODAY, model, byokKey: process.env.AI_API_KEY });
+  const model = process.env.EVAL_MODEL; // e.g. anthropic/claude-haiku-4.5 (direct SDK) — undefined uses the default
+  const parser = new GatewayTaskParser({ today: TODAY, model, apiKey: process.env.AI_API_KEY });
   console.log(`Evaluating model: ${model ?? "(default) openai/gpt-4o-mini"}\n`);
   let passed = 0;
   for (const [i, c] of parseCases.entries()) {

@@ -4,6 +4,15 @@
 > (writing-plans skill). Builds directly on the P1 fix (issue #4) already in the working tree
 > — the fake-fallback, honest `degraded` UX, and strict `modelTaskSchema` all stay.
 
+> **⚠️ PIVOT (2026-07-21, during implementation):** Gateway BYOK proved to be a **paid-tier
+> feature** — "BYOK is available only with paid credits" (verified: eval **0/5** on the free
+> tier). So the request-scoped-BYOK mechanism described below was **abandoned**. The delivered
+> design instead routes `anthropic/*` via the **direct `@ai-sdk/anthropic` SDK** on the user's
+> own Anthropic account (no Vercel payment); non-anthropic slugs stay on the managed gateway.
+> The two knobs (`aiMode` + `aiModel`) and the parser/route/eval structure are otherwise as
+> specified. Verified: eval **5/5** (anthropic direct) + **5/5** (gpt-4o-mini gateway). Everything
+> below about `providerOptions.gateway.byok` is superseded by the direct-SDK routing.
+
 ## 1. Goal
 
 Let the parser run on **the user's own paid Anthropic account via the Vercel AI Gateway

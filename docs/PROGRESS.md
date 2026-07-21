@@ -109,7 +109,8 @@ auto-deploys), then set Edge Config `aiMode = "real"` for production; then Miles
   structured output enforced by a `zod` contract schema. Behind a `TaskParser` interface.
   **Gateway is Vercel-managed (OIDC auth)** — zero token markup, $5/mo free credits, no
   provider key to manage; auth via `VERCEL_OIDC_TOKEN` (`vercel env pull` locally, automatic
-  on deploys). The earlier `AI_API_KEY` is **no longer used** for parsing (candidate to retire).
+  on deploys). The `AI_API_KEY` (Anthropic) **is** used for parsing — but only on the direct
+  `anthropic/*` path (see the provider switch below), not the default gateway path.
   - **Model switched from `anthropic/claude-haiku-4.5` → `openai/gpt-4o-mini`** (issue #4 P1):
     Haiku is gated on the Gateway **free tier** (`403 RestrictedModelsError`); gpt-4o-mini is
     available. gpt-4o-mini's **strict** structured outputs reject optional keys, so the model
@@ -117,11 +118,14 @@ auto-deploys), then set Edge Config `aiMode = "real"` for production; then Miles
     validation schema; `createTask` normalizes the nulls with `??`. **Note:** the free tier also
     **rate-limits** gpt-4o-mini under bursts (`GatewayRateLimitError`) — fine for single-user
     demo taps, and covered by the fallback below regardless.
-  - **Runtime provider/model switch (issue #4):** new Edge Config `aiModel`
-    (`Edge Config → env AI_MODEL → default openai/gpt-4o-mini`) picks the real-mode
-    gateway slug. `anthropic/*` slugs route on the user's **own Anthropic account**
-    via request-scoped BYOK (`AI_API_KEY` → `providerOptions.gateway.byok`), bypassing
-    the free-tier 403 + rate limits. Prod: set `aiModel = anthropic/claude-haiku-4.5`.
+  - **Runtime provider/model switch (issue #4):** Edge Config `aiModel`
+    (`Edge Config → env AI_MODEL → default openai/gpt-4o-mini`) picks the real-mode model.
+    `anthropic/*` runs on the user's **own Anthropic account** via the **direct
+    `@ai-sdk/anthropic` SDK** (`AI_API_KEY`), bypassing the Vercel gateway. _Gateway BYOK was
+    tried first but proved **paid-tier only** ("BYOK is available only with paid credits"), so
+    it is not viable on the free tier — hence the direct SDK._ Other slugs stay on the managed
+    gateway (free credits). **Verified: eval 5/5** on both `anthropic/claude-haiku-4.5` (direct)
+    and `openai/gpt-4o-mini` (gateway). Prod: set `aiModel = anthropic/claude-haiku-4.5`.
   - **Resilience (issue #4 P1):** if the real parser fails for any reason (gateway/model/
     rate-limit/timeout), `/api/organize` **falls back to `FakeTaskParser`** and returns
     `{ tasks, degraded: true }`; the Review screen shows an honest "AI temporarily unavailable —

@@ -15,6 +15,7 @@
     "eval:ai": "NODE_OPTIONS='--conditions=react-server' tsx scripts/eval-parser.ts"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.16",
     "@vercel/edge-config": "^1.4.3",
     "ai": "^7.0.32",
     "next": "16.2.10",

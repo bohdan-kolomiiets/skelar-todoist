@@ -30,7 +30,7 @@ export async function POST(request: Request): Promise<Response> {
       const model = await resolveAiModel();
       console.log(`[/api/organize] aiModel=${model}`);
       try {
-        parsed = await new GatewayTaskParser({ model, byokKey: process.env.AI_API_KEY }).parse(text);
+        parsed = await new GatewayTaskParser({ model, apiKey: process.env.AI_API_KEY }).parse(text);
       } catch (err) {
         // Real AI unavailable (gateway/model/billing/timeout). Stay demo-safe:
         // fall back to the deterministic parser so the user still gets a plan,

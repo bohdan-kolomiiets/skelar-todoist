@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/ai/mode", () => ({
@@ -23,18 +23,23 @@ vi.spyOn(console, "log").mockImplementation(() => {});
 
 import { POST } from "./route";
 
+const origKey = process.env.AI_API_KEY;
 beforeEach(() => {
   ctorArgs.value = null;
   process.env.AI_API_KEY = "sk-ant-test";
 });
+afterEach(() => {
+  if (origKey === undefined) delete process.env.AI_API_KEY;
+  else process.env.AI_API_KEY = origKey;
+});
 
-describe("POST /api/organize — real-mode model + BYOK wiring", () => {
-  it("constructs the gateway parser with the resolved model and AI_API_KEY as byokKey", async () => {
+describe("POST /api/organize — real-mode model + key wiring", () => {
+  it("constructs the real parser with the resolved model and AI_API_KEY as apiKey", async () => {
     const res = await POST(
       new Request("http://test/api/organize", { method: "POST", body: JSON.stringify({ text: "Gym" }) }),
     );
     expect(res.status).toBe(200);
-    expect(ctorArgs.value).toEqual({ model: "anthropic/claude-haiku-4.5", byokKey: "sk-ant-test" });
+    expect(ctorArgs.value).toEqual({ model: "anthropic/claude-haiku-4.5", apiKey: "sk-ant-test" });
     const json = await res.json();
     expect(json.degraded).toBe(false);
   });
