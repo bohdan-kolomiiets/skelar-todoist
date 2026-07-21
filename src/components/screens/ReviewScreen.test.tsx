@@ -45,13 +45,26 @@ describe("ReviewScreen", () => {
     expect(screen.getByText(/inbox · 2/i)).toBeInTheDocument();
   });
 
-  it("edits a task's title via the tap-to-edit sheet", async () => {
+  it("opens the editor from a whole-card affordance, not just the title text", async () => {
     render(<ReviewScreen proposal={proposal} onCommit={vi.fn()} onStartOver={vi.fn()} />);
-    await userEvent.click(screen.getByText("Finish the pitch deck"));
+    // The entire card is the edit control (issue #4 #3) — exposed as an "Edit <title>" button.
+    await userEvent.click(screen.getByRole("button", { name: /edit finish the pitch deck/i }));
     const titleInput = screen.getByLabelText(/title/i);
     await userEvent.clear(titleInput);
     await userEvent.type(titleInput, "Finalize the pitch deck");
     await userEvent.click(screen.getByRole("button", { name: /^done$/i }));
     expect(screen.getByText("Finalize the pitch deck")).toBeInTheDocument();
+  });
+
+  it("removing a card does not also open the editor", async () => {
+    render(<ReviewScreen proposal={proposal} onCommit={vi.fn()} onStartOver={vi.fn()} />);
+    await userEvent.click(screen.getAllByRole("button", { name: /remove/i })[0]);
+    expect(screen.queryByLabelText(/title/i)).not.toBeInTheDocument();
+  });
+
+  it("changing a card's placement does not open the editor", async () => {
+    render(<ReviewScreen proposal={proposal} onCommit={vi.fn()} onStartOver={vi.fn()} />);
+    await userEvent.click(screen.getByRole("button", { name: /Today/ }));
+    expect(screen.queryByLabelText(/title/i)).not.toBeInTheDocument();
   });
 });
