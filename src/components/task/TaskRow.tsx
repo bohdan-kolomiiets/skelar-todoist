@@ -2,6 +2,7 @@
 
 import type { Task } from "@/lib/task/types";
 import { cn } from "@/lib/cn";
+import { IconCheck, IconArrowRight } from "@tabler/icons-react";
 import { Chip } from "./Chip";
 import { PriorityFlag } from "./PriorityFlag";
 import { TimeOfDayChip } from "./TimeOfDayChip";
@@ -34,7 +35,7 @@ export function TaskRow({ task, today, onToggle, onOpen, onMove, moveTarget, tra
             done ? "border-text-muted bg-text-muted text-surface-2" : "border-border-strong",
           )}
         >
-          {done ? "✓" : ""}
+          {done ? <IconCheck size={13} aria-hidden /> : null}
         </span>
       </button>
 
@@ -63,7 +64,7 @@ export function TaskRow({ task, today, onToggle, onOpen, onMove, moveTarget, tra
         onClick={() => onMove(task.id, moveTarget)}
         className="flex min-h-11 flex-shrink-0 items-center rounded-full border border-border px-3 text-xs text-text-secondary"
       >
-        → {moveTarget === "today" ? "Today" : "Inbox"}
+        <IconArrowRight size={14} aria-hidden /> {moveTarget === "today" ? "Today" : "Inbox"}
       </button>
     </div>
   );
