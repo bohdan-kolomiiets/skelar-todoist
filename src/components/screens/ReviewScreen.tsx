@@ -70,9 +70,14 @@ export function ReviewScreen({ proposal, onCommit, onStartOver, degraded = false
             <button
               type="button"
               onClick={() => togglePlacement(task)}
-              className="pointer-events-auto inline-flex min-h-11 items-center rounded-full border border-border-strong bg-surface-1 px-2.5 text-xs"
+              // Binary toggle, not a menu (issue #4 #4): keep the placement chip, swap the
+              // misleading ▾ for a ⇄. Accessible name states the move action but still leads
+              // with the visible word (WCAG 2.5.3 Label in Name). ⇄ → ti-arrows-exchange in P3.
+              aria-label={task.doDate === today ? "Today, move to Inbox" : "Inbox, move to Today"}
+              className="pointer-events-auto inline-flex min-h-11 items-center gap-1.5 rounded-full border border-border-strong bg-surface-1 px-2.5 text-xs"
             >
-              {task.doDate === today ? "☀ Today ▾" : "📥 Inbox ▾"}
+              {task.doDate === today ? "☀ Today" : "📥 Inbox"}
+              <span aria-hidden="true" className="text-text-muted">⇄</span>
             </button>
           </div>
         </div>

@@ -39,9 +39,16 @@ describe("ReviewScreen", () => {
     expect(onCommit).toHaveBeenCalledTimes(1);
   });
 
+  it("labels the placement control as a move action, not a dropdown", () => {
+    render(<ReviewScreen proposal={proposal} onCommit={vi.fn()} onStartOver={vi.fn()} />);
+    // Today task offers to move to Inbox; Inbox task offers to move to Today.
+    expect(screen.getByRole("button", { name: /move to inbox/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /move to today/i })).toBeInTheDocument();
+  });
+
   it("toggles a task's placement between Today and Inbox", async () => {
     render(<ReviewScreen proposal={proposal} onCommit={vi.fn()} onStartOver={vi.fn()} />);
-    await userEvent.click(screen.getByRole("button", { name: /Today/ }));
+    await userEvent.click(screen.getByRole("button", { name: /move to inbox/i }));
     expect(screen.getByText(/inbox · 2/i)).toBeInTheDocument();
   });
 
@@ -64,7 +71,7 @@ describe("ReviewScreen", () => {
 
   it("changing a card's placement does not open the editor", async () => {
     render(<ReviewScreen proposal={proposal} onCommit={vi.fn()} onStartOver={vi.fn()} />);
-    await userEvent.click(screen.getByRole("button", { name: /Today/ }));
+    await userEvent.click(screen.getByRole("button", { name: /move to inbox/i }));
     expect(screen.queryByLabelText(/title/i)).not.toBeInTheDocument();
   });
 });
