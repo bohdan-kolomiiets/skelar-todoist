@@ -29,4 +29,9 @@ describe("POST /api/organize", () => {
     const res = await POST(req({}));
     expect(res.status).toBe(400);
   });
+
+  it("400s on an invalid JSON body", async () => {
+    const res = await POST(new Request("http://test/api/organize", { method: "POST", body: "not json" }));
+    expect(res.status).toBe(400);
+  });
 });

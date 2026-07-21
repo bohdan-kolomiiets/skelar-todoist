@@ -21,9 +21,9 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const mode = await resolveAiMode();
-  const parser: TaskParser = mode === "real" ? new GatewayTaskParser() : new FakeTaskParser();
 
   try {
+    const parser: TaskParser = mode === "real" ? new GatewayTaskParser() : new FakeTaskParser();
     const parsed = await parser.parse(text);
     const tasks = parsedTasksSchema.parse(parsed); // enforce the contract before it reaches the client
     return NextResponse.json({ tasks });
