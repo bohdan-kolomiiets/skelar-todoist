@@ -62,7 +62,7 @@ describe("CaptureFlow", () => {
     expect(await screen.findByRole("dialog", { name: /voice capture/i })).toBeInTheDocument();
   });
 
-  it("shows an arrow icon on Plan it, not a text arrow (issue #4 #9)", () => {
+  it("shows a spark on Plan it to signal the AI moment (P1)", () => {
     renderFlow();
     const planIt = screen.getByRole("button", { name: /plan it/i });
     expect(planIt.querySelector("svg")).toBeInTheDocument();

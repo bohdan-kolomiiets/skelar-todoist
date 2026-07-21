@@ -46,4 +46,14 @@ describe("TaskRow", () => {
     expect(screen.getByRole("button", { name: /completed/i })).toBeInTheDocument();
     expect(screen.queryByLabelText(/high priority/i)).toBeNull();
   });
+
+  it("shows a Tabler check on a done task and an arrow on the move button (P1)", () => {
+    // render a DONE task (status: "done") with the file's helper
+    const doneTask = { ...task, status: "done" as const };
+    render(<TaskRow task={doneTask} today={TODAY} onToggle={vi.fn()} onOpen={vi.fn()} onMove={vi.fn()} moveTarget="inbox" />);
+    const complete = screen.getByRole("button", { name: /complete/i });
+    expect(complete.querySelector("svg")).toBeInTheDocument();
+    const move = screen.getByRole("button", { name: /move to/i });
+    expect(move.querySelector("svg")).toBeInTheDocument();
+  });
 });

@@ -70,7 +70,7 @@ export function InboxScreen() {
         <div className="mt-2 border-t border-border pt-2">
           <div className="flex items-center justify-between">
             <span className="text-[13px] font-medium text-text-secondary">Completed · {completed.length}</span>
-            <button type="button" onClick={() => setShowCompleted(!showCompleted)} className="text-[13px] text-text-accent">
+            <button type="button" onClick={() => setShowCompleted(!showCompleted)} className="text-[13px] text-text-secondary">
               {showCompleted ? "Hide" : "Show"}
             </button>
           </div>

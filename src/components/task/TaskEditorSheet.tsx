@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { IconX } from "@tabler/icons-react";
 import type { Task, TaskDraft, TimeOfDay, Priority } from "@/lib/task/types";
 import { TagsInput } from "./TagsInput";
 
@@ -32,9 +33,9 @@ export function TaskEditorSheet({ open, initial, title = "Edit task", onClose, o
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-surface-2" role="dialog" aria-label={title}>
       <header className="flex items-center justify-between border-b border-border px-4 py-1.5">
-        <button type="button" onClick={onClose} aria-label="Close" className="-ml-2 flex h-11 w-11 items-center justify-center text-text-secondary">✕</button>
+        <button type="button" onClick={onClose} aria-label="Close" className="-ml-2 flex h-11 w-11 items-center justify-center text-text-secondary"><IconX size={18} aria-hidden /></button>
         <span className="font-medium">{title}</span>
-        <button type="button" onClick={() => onSave(draft)} className="-mr-2 flex min-h-11 items-center px-2 font-medium text-text-accent">Done</button>
+        <button type="button" onClick={() => onSave(draft)} className="-mr-2 flex min-h-11 items-center px-2 font-medium text-text-primary">Done</button>
       </header>
 
       <div className="flex-1 overflow-y-auto px-4 py-3">

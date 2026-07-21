@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { IconWand, IconHelpCircle, IconMicrophone, IconArrowRight } from "@tabler/icons-react";
+import { IconWand, IconHelpCircle, IconMicrophone, IconSparkles } from "@tabler/icons-react";
 import { DaysparkWordmark } from "@/components/brand/DaysparkWordmark";
 import { TipsSheet } from "@/components/capture/TipsSheet";
 import { VoiceComingSoonSheet } from "@/components/capture/VoiceComingSoonSheet";
@@ -104,7 +104,7 @@ export function CaptureFlow() {
               disabled={busy || !text.trim()}
               className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-fill-accent px-4 py-2 text-[15px] font-medium text-on-accent disabled:opacity-50"
             >
-              {busy ? "Planning…" : <>Plan it <IconArrowRight size={17} aria-hidden /></>}
+              {busy ? "Planning…" : <>Plan it <IconSparkles size={17} aria-hidden /></>}
             </button>
           </div>
         </div>

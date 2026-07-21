@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { IconX, IconSun, IconInbox, IconArrowsExchange } from "@tabler/icons-react";
 import { todayISO } from "@/lib/date/clock";
 import { formatDoDate } from "@/lib/date/format";
 import type { ParsedTask, TaskDraft } from "@/lib/task/types";
@@ -62,7 +63,7 @@ export function ReviewScreen({ proposal, onCommit, onStartOver, degraded = false
               onClick={() => setPendingRemoval(task)}
               className="pointer-events-auto flex min-h-11 min-w-11 flex-shrink-0 items-center justify-center text-text-muted"
             >
-              ✕
+              <IconX size={18} aria-hidden />
             </button>
           </div>
           {(scheduledFor || task.deadline || task.timeOfDay || (task.tags?.length ?? 0) > 0) && (
@@ -83,8 +84,12 @@ export function ReviewScreen({ proposal, onCommit, onStartOver, degraded = false
               aria-label={task.doDate === today ? "Today, move to Inbox" : "Inbox, move to Today"}
               className="pointer-events-auto inline-flex min-h-11 items-center gap-1.5 rounded-full border border-border-strong bg-surface-1 px-2.5 text-xs"
             >
-              {task.doDate === today ? "☀ Today" : "📥 Inbox"}
-              <span aria-hidden="true" className="text-text-muted">⇄</span>
+              {task.doDate === today ? (
+                <><IconSun size={14} aria-hidden /> Today</>
+              ) : (
+                <><IconInbox size={14} aria-hidden /> Inbox</>
+              )}
+              <IconArrowsExchange size={14} aria-hidden className="text-text-muted" />
             </button>
           </div>
         </div>
@@ -110,9 +115,13 @@ export function ReviewScreen({ proposal, onCommit, onStartOver, degraded = false
             AI was temporarily unavailable — organized with a basic parser. Tap any task to adjust.
           </p>
         )}
-        {todays.length > 0 && <p className="text-[13px] text-text-secondary">☀ Today · {todays.length}</p>}
+        {todays.length > 0 && (
+          <p className="flex items-center gap-1 text-[13px] text-text-secondary"><IconSun size={13} aria-hidden /> Today · {todays.length}</p>
+        )}
         {todays.map(card)}
-        {inbox.length > 0 && <p className="mt-1.5 text-[13px] text-text-secondary">📥 Inbox · {inbox.length}</p>}
+        {inbox.length > 0 && (
+          <p className="mt-1.5 flex items-center gap-1 text-[13px] text-text-secondary"><IconInbox size={13} aria-hidden /> Inbox · {inbox.length}</p>
+        )}
         {inbox.map(card)}
       </div>
 
