@@ -6,13 +6,16 @@
 > Last updated: 2026-07-21
 
 ## Current phase
-**Phase 2 — core flow merged (PR #3); issue #4 P1 + AI provider switch done (PR #7, awaiting merge).**
+**Phase 2 — core flow merged (PR #3); issue #4 fully addressed: P1 (PR #7), P2 (PR #8), P3 (P3 PR).**
 The graded MVP works end-to-end (brain dump → AI → review → save → "Today"). **Real AI is unblocked:**
 `anthropic/claude-haiku-4.5` runs on the user's own Anthropic account via the direct `@ai-sdk/anthropic`
 SDK (`AI_API_KEY`); `openai/gpt-4o-mini` is the free-tier gateway default; runtime-switchable via Edge
-Config `aiModel`. Any real-parser failure degrades to the fake parser with an honest notice. Verified:
-eval **5/5** both models; unit **121**, e2e **4/4**, lint+typecheck clean; whole-branch review 0
-Critical/Important. Still open on #4: **P2/P3** (flow-UX + Tabler icons).
+Config `aiModel`. Any real-parser failure degrades to the fake parser with an honest notice.
+**Issue #4 closed:** P2 = Start-over keeps the dump, whole Review card opens the editor, the placement
+pill reads as a ⇄ toggle, the Completed toggle persists (localStorage seam). P3 = adopted
+`@tabler/icons-react` app-wide (tab bar + composer), fixed the example-chip overlap, and shipped a real
+**Tips guide sheet** + a tappable **mic voice teaser** (fake-door; waitlist deferred to Plan 2) on a
+shared `BottomSheet`. Verified: unit **147**, e2e **4/4**, lint+typecheck clean. **Next: Dayspark brand.**
 
 ## Done
 - [x] Git repo on `main`; GitHub remote (`github.com:bohdan-kolomiiets/skelar-todoist`)
@@ -69,19 +72,13 @@ Critical/Important. Still open on #4: **P2/P3** (flow-UX + Tabler icons).
   `.superpowers/sdd/progress.md`.
 
 ## Next (in order)
-1. **Merge PR #7** (issue #4 P1 + provider switch; branch protection requires the CI `test` gate).
-   Then in the Vercel dashboard set Edge Config `aiModel = anthropic/claude-haiku-4.5` to run on the
-   Anthropic account (`AI_API_KEY` already set; no redeploy) and smoke-test the live flow. Instant
-   revert: `aiModel = openai/gpt-4o-mini`, or `aiMode = fake`. (`aiMode = "real"` is already set in prod.)
-2. **Issue #4 P2/P3** — flow-UX (Start-over keeps text, whole-card edit, placement-pill affordance,
-   persist Completed toggle) + the Tabler-icon pass (tab bar, mic, wand, help). Next coding session.
-3. **Dayspark brand UI/UX** — implement the approved spec (PR #6): brand/logo, wordmark, OG image,
+1. **Dayspark brand UI/UX** — implement the approved spec (PR #6): brand/logo, wordmark, OG image,
    favicons, PWA manifest, metadata.
-4. **Milestone C** — needs-a-date (the additive `needsDate` flag), first-run onboarding
+2. **Milestone C** — needs-a-date (the additive `needsDate` flag), first-run onboarding
    (`hasOrganizedOnce`), exact empty-state copy, quick-add AI entry points, plus the deferred
    robustness items (client-tz `today` into `/api/organize`, empty-parse-result UX,
    deadline-badge tone) tracked in `.superpowers/sdd/progress.md`.
-5. **Plan 2** — access ladder, freemium metering, Plans/Settings/Welcome, voice fake-door.
+3. **Plan 2** — access ladder, freemium metering, Plans/Settings/Welcome, voice fake-door.
 
 ## Parked (revisit after Dayspark UI + Milestone C)
 - **AI doesn't infer relative-offset dates.** Manual test "I need to not forget to grab a
