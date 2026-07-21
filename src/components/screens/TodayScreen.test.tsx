@@ -6,14 +6,24 @@ import { TaskStoreProvider } from "@/lib/tasks/TaskStoreProvider";
 import { MemoryTaskStore } from "@/lib/storage/MemoryTaskStore";
 import { createTask } from "@/lib/task/createTask";
 import { todayISO } from "@/lib/date/clock";
+import { AuthProvider } from "@/lib/auth/AuthProvider";
+import { LocalAuthService } from "@/lib/auth/LocalAuthService";
+import { SaveNudgeProvider } from "@/lib/nudge/SaveNudgeProvider";
 import type { Task } from "@/lib/task/types";
 
-const renderWith = (tasks: Task[] = []) =>
-  render(
-    <TaskStoreProvider store={new MemoryTaskStore(tasks)}>
-      <TodayScreen />
-    </TaskStoreProvider>,
+const renderWith = (tasks: Task[] = []) => {
+  const service = new LocalAuthService();
+  service.startGuest();
+  return render(
+    <AuthProvider service={service}>
+      <SaveNudgeProvider>
+        <TaskStoreProvider store={new MemoryTaskStore(tasks)}>
+          <TodayScreen />
+        </TaskStoreProvider>
+      </SaveNudgeProvider>
+    </AuthProvider>,
   );
+};
 
 describe("TodayScreen", () => {
   beforeEach(() => localStorage.clear());

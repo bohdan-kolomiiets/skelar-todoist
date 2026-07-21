@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useTasks } from "@/lib/tasks/useTasks";
+import { useSaveNudge } from "@/lib/nudge/useSaveNudge";
 import { usePersistentState } from "@/lib/preferences/usePersistentState";
 import { viewOf } from "@/lib/task/routing";
 import { groupToday } from "@/lib/task/ordering";
@@ -21,6 +22,7 @@ const SECTIONS: Array<["overdue" | "morning" | "afternoon" | "evening" | "anytim
 
 export function TodayScreen() {
   const { tasks, addTask, updateTask, removeTask, toggleComplete, moveTask } = useTasks();
+  const { notifySaved } = useSaveNudge();
   const today = todayISO();
   const [editing, setEditing] = useState<Task | "new" | null>(null);
   // Persisted per-screen (issue #4 #5) so "Show" survives refresh / tab switch.
@@ -86,7 +88,7 @@ export function TodayScreen() {
           initial={editing === "new" ? { title: "", doDate: today, tags: [] } : editing}
           onClose={() => setEditing(null)}
           onSave={(draft: TaskDraft) => {
-            if (editing === "new") addTask(draft);
+            if (editing === "new") { addTask(draft); notifySaved(); }
             else updateTask(editing.id, draft);
             setEditing(null);
           }}
