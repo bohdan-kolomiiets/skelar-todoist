@@ -118,7 +118,7 @@ export function CaptureFlow() {
       {error && <p className="text-[13px] text-text-danger">{error}</p>}
       {firstRun && (
         <p className="text-[13px] text-text-secondary">
-          Tip: say <em>when</em> — "today", "tomorrow 3pm", "gym this evening", "report due Fri".
+          Tip: say <em>when</em> — “today”, “tomorrow 3pm”, “gym this evening”, “report due Fri”.
         </p>
       )}
       <TipsSheet open={tipsOpen} onClose={() => setTipsOpen(false)} />

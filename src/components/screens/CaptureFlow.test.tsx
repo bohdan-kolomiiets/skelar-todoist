@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
@@ -34,6 +34,7 @@ function renderCapture() {
 }
 
 describe("CaptureFlow", () => {
+  beforeEach(() => localStorage.clear());
   it("shows the composer and the example chip on first run", () => {
     renderCapture();
     expect(screen.getByPlaceholderText(/what's on your mind/i)).toBeInTheDocument();
