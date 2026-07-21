@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { InboxScreen } from "./InboxScreen";
 import { TaskStoreProvider } from "@/lib/tasks/TaskStoreProvider";
 import { MemoryTaskStore } from "@/lib/storage/MemoryTaskStore";
@@ -29,5 +30,15 @@ describe("InboxScreen", () => {
     expect(screen.getByText("Someday · 1")).toBeInTheDocument();
     expect(screen.getByText("Learn guitar")).toBeInTheDocument();
     expect(screen.getByText("Jan 1")).toBeInTheDocument();
+  });
+
+  it("shows and hides completed tasks on toggle", async () => {
+    const tasks = [createTask({ title: "Learn guitar", doDate: null }, { id: "s1", order: 1 })];
+    renderWith(tasks);
+    await userEvent.click(screen.getByRole("button", { name: /complete/i }));
+    expect(screen.getByText(/completed · 1/i)).toBeInTheDocument();
+    expect(screen.queryByText("Learn guitar")).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /show/i }));
+    expect(screen.getByText("Learn guitar")).toBeInTheDocument();
   });
 });

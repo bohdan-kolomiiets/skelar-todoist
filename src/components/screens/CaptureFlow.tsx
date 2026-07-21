@@ -54,7 +54,7 @@ export function CaptureFlow() {
         <button
           type="button"
           onClick={() => setText(EXAMPLE_DUMP)}
-          className="absolute right-2 top-2 rounded-full border border-border-strong bg-surface-2 px-2.5 py-1 text-xs"
+          className="absolute right-2 top-2 min-h-11 rounded-full border border-border-strong bg-surface-2 px-2.5 py-1 text-xs"
         >
           ✨ Try an example
         </button>
@@ -66,14 +66,14 @@ export function CaptureFlow() {
           className="mt-8 min-h-44 flex-1 resize-none bg-transparent text-base leading-relaxed outline-none placeholder:text-text-muted"
         />
         <div className="mt-1 flex items-center justify-between border-t border-border pt-2">
-          <button type="button" className="text-[13px] text-text-secondary">Tips</button>
+          <button type="button" className="min-h-11 text-[13px] text-text-secondary">Tips</button>
           <div className="flex items-center gap-3">
             <button type="button" disabled aria-label="Voice input, coming soon" className="text-text-disabled">🎙️</button>
             <button
               type="button"
               onClick={planIt}
               disabled={busy || !text.trim()}
-              className="rounded-full bg-fill-accent px-4 py-2 text-[15px] font-medium text-on-accent disabled:opacity-50"
+              className="min-h-11 rounded-full bg-fill-accent px-4 py-2 text-[15px] font-medium text-on-accent disabled:opacity-50"
             >
               {busy ? "Planning…" : "Plan it →"}
             </button>

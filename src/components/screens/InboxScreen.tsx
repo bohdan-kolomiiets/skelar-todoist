@@ -15,9 +15,12 @@ export function InboxScreen() {
   const { tasks, addTask, updateTask, removeTask, toggleComplete, moveTask } = useTasks();
   const today = todayISO();
   const [editing, setEditing] = useState<Task | "new" | null>(null);
+  const [showCompleted, setShowCompleted] = useState(false);
 
-  const inbox = useMemo(() => tasks.filter((t) => t.status === "active" && viewOf(t, today) === "inbox"), [tasks, today]);
-  const { scheduled, someday } = useMemo(() => groupInbox(inbox, today), [inbox, today]);
+  const inboxAll = useMemo(() => tasks.filter((t) => viewOf(t, today) === "inbox"), [tasks, today]);
+  const active = useMemo(() => inboxAll.filter((t) => t.status === "active"), [inboxAll]);
+  const completed = useMemo(() => inboxAll.filter((t) => t.status === "done"), [inboxAll]);
+  const { scheduled, someday } = useMemo(() => groupInbox(active, today), [active, today]);
 
   const rowProps = (task: Task) => ({
     task, today, onToggle: toggleComplete, onOpen: setEditing, onMove: moveTask, moveTarget: "today" as const,
@@ -27,10 +30,10 @@ export function InboxScreen() {
     <section className="flex flex-1 flex-col px-4 pb-3">
       <header className="pb-2 pt-4">
         <h1 className="text-xl font-medium">Inbox</h1>
-        <p className="mt-0.5 text-[13px] text-text-secondary">{inbox.length} waiting</p>
+        <p className="mt-0.5 text-[13px] text-text-secondary">{active.length} waiting</p>
       </header>
 
-      {inbox.length === 0 ? (
+      {inboxAll.length === 0 ? (
         <p className="mt-10 text-center text-text-secondary">Inbox zero — nothing waiting, capture your thoughts</p>
       ) : (
         <>
@@ -60,6 +63,18 @@ export function InboxScreen() {
       <button type="button" onClick={() => setEditing("new")} className="mt-2 flex min-h-11 w-full items-center gap-2.5 py-3 text-left text-sm text-text-secondary">
         + Add task
       </button>
+
+      {completed.length > 0 && (
+        <div className="mt-2 border-t border-border pt-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[13px] font-medium text-text-secondary">Completed · {completed.length}</span>
+            <button type="button" onClick={() => setShowCompleted((s) => !s)} className="text-[13px] text-text-accent">
+              {showCompleted ? "Hide" : "Show"}
+            </button>
+          </div>
+          {showCompleted && completed.map((task) => <TaskRow key={task.id} {...rowProps(task)} />)}
+        </div>
+      )}
 
       {editing && (
         <TaskEditorSheet
