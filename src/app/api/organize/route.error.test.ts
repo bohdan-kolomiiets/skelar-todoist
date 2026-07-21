@@ -10,6 +10,10 @@ vi.mock("@/lib/ai/fakeParser", () => ({
   },
 }));
 
+// Silence the route's aiMode log + internal error log so this error-path test stays clean.
+vi.spyOn(console, "log").mockImplementation(() => {});
+vi.spyOn(console, "error").mockImplementation(() => {});
+
 import { POST } from "./route";
 
 describe("POST /api/organize — parser failure", () => {
