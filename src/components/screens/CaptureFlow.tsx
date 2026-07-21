@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { IconWand, IconHelpCircle } from "@tabler/icons-react";
+import { IconWand, IconHelpCircle, IconMicrophone, IconArrowRight } from "@tabler/icons-react";
 import { TipsSheet } from "@/components/capture/TipsSheet";
+import { VoiceComingSoonSheet } from "@/components/capture/VoiceComingSoonSheet";
 import { organize } from "@/lib/ai/organizeClient";
 import { useTasks } from "@/lib/tasks/useTasks";
 import type { ParsedTask } from "@/lib/task/types";
@@ -23,6 +24,7 @@ export function CaptureFlow() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tipsOpen, setTipsOpen] = useState(false);
+  const [voiceOpen, setVoiceOpen] = useState(false);
 
   async function planIt() {
     setBusy(true);
@@ -84,14 +86,21 @@ export function CaptureFlow() {
             Tips
           </button>
           <div className="flex items-center gap-3">
-            <button type="button" disabled aria-label="Voice input, coming soon" className="text-text-disabled">🎙️</button>
+            <button
+              type="button"
+              onClick={() => setVoiceOpen(true)}
+              aria-label="Voice input, coming soon"
+              className="flex min-h-11 min-w-11 items-center justify-center text-text-disabled"
+            >
+              <IconMicrophone size={20} aria-hidden />
+            </button>
             <button
               type="button"
               onClick={planIt}
               disabled={busy || !text.trim()}
-              className="min-h-11 rounded-full bg-fill-accent px-4 py-2 text-[15px] font-medium text-on-accent disabled:opacity-50"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-fill-accent px-4 py-2 text-[15px] font-medium text-on-accent disabled:opacity-50"
             >
-              {busy ? "Planning…" : "Plan it →"}
+              {busy ? "Planning…" : <>Plan it <IconArrowRight size={17} aria-hidden /></>}
             </button>
           </div>
         </div>
@@ -101,6 +110,7 @@ export function CaptureFlow() {
         Tip: say <em>when</em> — “today”, “tomorrow 3pm”, “gym this evening”, “report due Fri”.
       </p>
       <TipsSheet open={tipsOpen} onClose={() => setTipsOpen(false)} />
+      <VoiceComingSoonSheet open={voiceOpen} onClose={() => setVoiceOpen(false)} />
     </section>
   );
 }

@@ -56,6 +56,18 @@ describe("CaptureFlow", () => {
     expect(await screen.findByRole("dialog", { name: /how i read your dump/i })).toBeInTheDocument();
   });
 
+  it("opens the voice coming-soon sheet when the mic is tapped (issue #4 #9)", async () => {
+    renderFlow();
+    await userEvent.click(screen.getByRole("button", { name: /voice input/i }));
+    expect(await screen.findByRole("dialog", { name: /voice capture/i })).toBeInTheDocument();
+  });
+
+  it("shows an arrow icon on Plan it, not a text arrow (issue #4 #9)", () => {
+    renderFlow();
+    const planIt = screen.getByRole("button", { name: /plan it/i });
+    expect(planIt.querySelector("svg")).toBeInTheDocument();
+  });
+
   it("parses a dump and transitions to Review", async () => {
     renderFlow();
     await userEvent.type(screen.getByPlaceholderText(/what's on your mind/i), "Gym this evening. Read design book.");
