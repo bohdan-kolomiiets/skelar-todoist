@@ -1,10 +1,9 @@
 import { test, expect } from "@playwright/test";
 
-test("home page renders the product name", async ({ page }) => {
+test("landing redirects a first-time visitor to Capture", async ({ page }) => {
   await page.goto("/");
-  await expect(
-    page.getByRole("heading", { name: /ai day planner/i }),
-  ).toBeVisible();
+  await expect(page).toHaveURL(/\/capture/);
+  await expect(page.getByRole("button", { name: /plan it/i })).toBeVisible();
 });
 
 test("health endpoint responds ok", async ({ request }) => {
