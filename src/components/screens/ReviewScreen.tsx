@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { todayISO } from "@/lib/date/clock";
+import { formatDoDate } from "@/lib/date/format";
 import type { ParsedTask, TaskDraft } from "@/lib/task/types";
 import { Chip } from "@/components/task/Chip";
 import { PriorityFlag } from "@/components/task/PriorityFlag";
@@ -35,6 +36,9 @@ export function ReviewScreen({ proposal, onCommit, onStartOver, degraded = false
 
   const card = (task: ParsedTask) => {
     const idx = items.indexOf(task);
+    // A future do-date is the scheduling the user asked for ("in 3 days") — surface it on
+    // the card. Today's tasks already sit under the "☀ Today" header, so no redundant chip.
+    const scheduledFor = task.doDate && task.doDate !== today ? task.doDate : null;
     return (
       <div key={idx} className="relative rounded-xl border border-border bg-surface-2 p-3">
         {/* Stretched edit affordance (issue #4 #3): a full-card button sits behind the
@@ -61,8 +65,9 @@ export function ReviewScreen({ proposal, onCommit, onStartOver, degraded = false
               ✕
             </button>
           </div>
-          {(task.deadline || task.timeOfDay || (task.tags?.length ?? 0) > 0) && (
+          {(scheduledFor || task.deadline || task.timeOfDay || (task.tags?.length ?? 0) > 0) && (
             <div className="mt-2 flex flex-wrap gap-1.5">
+              {scheduledFor && <Chip>{formatDoDate(scheduledFor, today)}</Chip>}
               {task.deadline && <DeadlineBadge deadline={task.deadline} today={today} />}
               {task.timeOfDay && <TimeOfDayChip value={task.timeOfDay} />}
               {task.tags?.map((t) => <Chip key={t}>{t}</Chip>)}

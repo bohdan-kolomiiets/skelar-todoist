@@ -3,11 +3,18 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ReviewScreen } from "./ReviewScreen";
 import { todayISO } from "@/lib/date/clock";
+import { formatDoDate } from "@/lib/date/format";
 
 const proposal = [
   { title: "Finish the pitch deck", doDate: todayISO(), deadline: "2999-01-01", priority: "high" as const },
   { title: "Read design book", doDate: null },
 ];
+
+/** Local-time date arithmetic that matches todayISO()'s local getters. */
+function addDays(iso: string, days: number): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  return todayISO(new Date(y, m - 1, d + days));
+}
 
 describe("ReviewScreen", () => {
   it("groups tasks into Today and Inbox with a dynamic commit label", () => {
@@ -51,6 +58,25 @@ describe("ReviewScreen", () => {
     await userEvent.click(commitButton);
     await userEvent.click(commitButton);
     expect(onCommit).toHaveBeenCalledTimes(1);
+  });
+
+  it("surfaces a future-dated task's do-date on its card, but not for today's tasks", () => {
+    const today = todayISO();
+    const inThreeDays = addDays(today, 3);
+    render(
+      <ReviewScreen
+        proposal={[
+          { title: "Grab delivery", doDate: inThreeDays, timeOfDay: "morning" as const },
+          { title: "Ship it today", doDate: today },
+        ]}
+        onCommit={vi.fn()}
+        onStartOver={vi.fn()}
+      />,
+    );
+    // The future-dated task lands in Inbox; its card must say WHEN, not just "morning".
+    expect(screen.getByText(formatDoDate(inThreeDays, today))).toBeInTheDocument();
+    // A task already under the "Today" header shouldn't repeat today's date.
+    expect(screen.queryByText(formatDoDate(today, today))).not.toBeInTheDocument();
   });
 
   it("labels the placement control as a move action, not a dropdown", () => {
