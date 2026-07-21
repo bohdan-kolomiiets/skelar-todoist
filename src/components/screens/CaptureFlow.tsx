@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { IconWand, IconHelpCircle, IconMicrophone, IconSparkles } from "@tabler/icons-react";
 import { DaysparkWordmark } from "@/components/brand/DaysparkWordmark";
@@ -12,6 +12,7 @@ import { organize } from "@/lib/ai/organizeClient";
 import { useTasks } from "@/lib/tasks/useTasks";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useSaveNudge } from "@/lib/nudge/useSaveNudge";
+import { usePersistentState } from "@/lib/preferences/usePersistentState";
 import { LocalUsageService, USAGE_KEY } from "@/lib/usage/LocalUsageService";
 import { profileKey } from "@/lib/profile/profileKey";
 import { todayISO } from "@/lib/date/clock";
@@ -22,6 +23,14 @@ const EXAMPLE_DUMP =
   "Finish the pitch deck today, due Friday. Gym this evening. Reply to Anna — urgent. Someday read that design book.";
 const PLACEHOLDER =
   "What's on your mind?\n\nGet everything out of your head — tasks, errands, deadlines. I'll sort it into your day.";
+
+// Hydration-safe: mirrors AuthProvider/TaskStoreProvider (see those files for the
+// full rationale). getServerSnapshot's `false` is what both the server render and
+// the client's first (hydration) render see, so adopting real client-only values
+// (below) can never desync from the server-sent markup.
+const neverSubscribe = () => () => {};
+const getIsHydratedOnClient = () => true;
+const getIsHydratedOnServer = () => false;
 
 export function CaptureFlow() {
   const router = useRouter();
@@ -42,10 +51,30 @@ export function CaptureFlow() {
     () => new LocalUsageService(profileKey(USAGE_KEY, profile?.id ?? "guest")),
     [profile?.id],
   );
-  const [limit, setLimit] = useState(3); // freeDailyInputs; updated from the organize response
-  const [used, setUsed] = useState(0); // today's count, for the "N left" display + limit sheet
+  // freeDailyInputs — an admin-config value, not per-profile — persisted via the
+  // preference seam so a fresh mount (reload, new tab, back navigation) knows the
+  // real limit immediately instead of assuming the hardcoded default of 3. Without
+  // this, the pre-organize gate below under-counts on every remount — e.g. with a
+  // configured limit of 1, a returning user whose local state reset to the default
+  // of 3 would sail past the gate and trigger an extra, unbudgeted organize() call
+  // before the server's echoed freeDailyInputs corrected it. usePersistentState is
+  // itself hydration-safe (defaults to 3 through the first/hydration render, then
+  // adopts the stored value), so this can't desync from the server-sent markup.
+  const [limit, setLimit] = usePersistentState<number>("freeDailyInputs", 3);
+
+  // today's count, for the "N left" display + limit sheet. Hydration-safe like
+  // `limit`/`isHydrated` above: `usage.count(today)` reads localStorage, which would
+  // desync SSR (no localStorage → 0) from a returning user's real client-side count
+  // if read directly during render, so it's adopted once, right after hydration
+  // commits, via the same during-render pattern as TaskStoreProvider/AuthProvider.
+  const isHydrated = useSyncExternalStore(neverSubscribe, getIsHydratedOnClient, getIsHydratedOnServer);
+  const [used, setUsed] = useState(0);
+  const [usedHydrated, setUsedHydrated] = useState(false);
+  if (isHydrated && !usedHydrated) {
+    setUsedHydrated(true);
+    setUsed(usage.count(today));
+  }
   const [limitOpen, setLimitOpen] = useState(false);
-  const usedToday = usage.count(today);
 
   async function planIt() {
     if (!isPro && usage.remaining(today, limit) <= 0) {
@@ -147,7 +176,7 @@ export function CaptureFlow() {
       {error && <p className="text-[13px] text-text-danger">{error}</p>}
       {!isPro && (
         <p className="text-[13px] text-text-muted">
-          {Math.max(0, limit - usedToday)} of {limit} AI plans left today
+          {Math.max(0, limit - used)} of {limit} AI plans left today
         </p>
       )}
       {firstRun && (
