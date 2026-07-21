@@ -11,6 +11,7 @@ vi.mock("@/lib/ai/organizeClient", () => ({
       { title: "Read design book", doDate: null },
     ],
     degraded: false,
+    freeDailyInputs: 3,
   }),
 }));
 
@@ -21,10 +22,11 @@ import { MemoryTaskStore } from "@/lib/storage/MemoryTaskStore";
 import { AuthProvider } from "@/lib/auth/AuthProvider";
 import { LocalAuthService } from "@/lib/auth/LocalAuthService";
 import { SaveNudgeProvider } from "@/lib/nudge/SaveNudgeProvider";
+import { profileKey } from "@/lib/profile/profileKey";
+import { USAGE_KEY } from "@/lib/usage/LocalUsageService";
+import { todayISO } from "@/lib/date/clock";
 
-function renderCapture() {
-  const service = new LocalAuthService();
-  service.startGuest();
+function renderCaptureWith(service: LocalAuthService) {
   return render(
     <AuthProvider service={service}>
       <SaveNudgeProvider>
@@ -36,12 +38,23 @@ function renderCapture() {
   );
 }
 
+function renderCapture() {
+  const service = new LocalAuthService();
+  service.startGuest();
+  return renderCaptureWith(service);
+}
+
 describe("CaptureFlow", () => {
   beforeEach(() => localStorage.clear());
   it("shows the composer and the example chip on first run", () => {
     renderCapture();
     expect(screen.getByPlaceholderText(/what's on your mind/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /try an example/i })).toBeInTheDocument();
+  });
+
+  it("shows a Settings gear linking to /settings", () => {
+    renderCapture();
+    expect(screen.getByRole("link", { name: /settings/i })).toHaveAttribute("href", "/settings");
   });
 
   it("shows a wand icon on the example chip, not an emoji (issue #4 #7)", () => {
@@ -92,6 +105,7 @@ describe("CaptureFlow", () => {
     vi.mocked(organize).mockResolvedValueOnce({
       tasks: [{ title: "Gym", doDate: null, timeOfDay: "evening" }],
       degraded: true,
+      freeDailyInputs: 3,
     });
     renderCapture();
     await userEvent.type(screen.getByPlaceholderText(/what's on your mind/i), "Gym this evening.");
@@ -154,5 +168,77 @@ describe("CaptureFlow", () => {
       </AuthProvider>,
     );
     expect(screen.queryByRole("button", { name: /try an example/i })).not.toBeInTheDocument();
+  });
+
+  it("blocks Plan it with the limit sheet when a non-Pro user is out of inputs", async () => {
+    localStorage.clear();
+    vi.mocked(organize).mockClear();
+    const service = new LocalAuthService();
+    const guest = service.startGuest();
+    // Pre-exhaust today's usage for this profile (default limit 3).
+    // Use the same local-date source as CaptureFlow (todayISO), not UTC — near
+    // local midnight, `new Date().toISOString()` disagrees with the app's local date.
+    const today = todayISO();
+    localStorage.setItem(profileKey(USAGE_KEY, guest.id), JSON.stringify({ date: today, count: 3 }));
+    renderCaptureWith(service);
+    await userEvent.type(screen.getByLabelText(/brain dump/i), "something");
+    await userEvent.click(screen.getByRole("button", { name: /plan it/i }));
+    expect(await screen.findByText(/out of ai plans for today/i)).toBeInTheDocument();
+    // Non-blocking, no parse runs: the gate short-circuits before organize() is called.
+    expect(organize).not.toHaveBeenCalled();
+  });
+
+  it("reads the persisted limit on a fresh mount instead of the hardcoded default (regression)", async () => {
+    // Regression coverage for a bug the M2 Task 8 e2e surfaced: `limit` used to be a
+    // plain useState(3), so every fresh mount (reload/back-nav) forgot a configured
+    // limit != 3 and under-counted the gate, letting one extra organize() call
+    // through. It's now backed by usePersistentState("freeDailyInputs", 3), which
+    // persists to the "planner.pref." + key seam (see preferenceStore.ts) — seed
+    // that key directly here, the same way CaptureFlow reads it via usePersistentState.
+    localStorage.clear();
+    vi.mocked(organize).mockClear();
+    const service = new LocalAuthService();
+    const guest = service.startGuest();
+    const today = todayISO();
+    localStorage.setItem("planner.pref.freeDailyInputs", JSON.stringify(1)); // persisted limit: 1, not the hardcoded 3
+    localStorage.setItem(profileKey(USAGE_KEY, guest.id), JSON.stringify({ date: today, count: 1 })); // budget already spent
+    renderCaptureWith(service);
+    await userEvent.type(screen.getByLabelText(/brain dump/i), "something");
+    await userEvent.click(screen.getByRole("button", { name: /plan it/i }));
+    // With the persisted limit of 1 and usage of 1, remaining is 0 → blocked. If
+    // `limit` had reset to the hardcoded default of 3 (the bug), remaining would be
+    // 3 - 1 = 2 and this would sail through to Review instead of blocking here.
+    expect(await screen.findByText(/out of ai plans for today/i)).toBeInTheDocument();
+    expect(organize).not.toHaveBeenCalled();
+  });
+
+  it("never gates or meters a Pro user, even with exhausted usage", async () => {
+    localStorage.clear();
+    const service = new LocalAuthService();
+    const guest = service.startGuest();
+    service.setTier("pro");
+    // Same shape as the block-when-exhausted case, but for a Pro profile — the
+    // gate (and the "N left" meter line) must not apply to Pro users at all.
+    const today = todayISO();
+    localStorage.setItem(profileKey(USAGE_KEY, guest.id), JSON.stringify({ date: today, count: 3 }));
+    renderCaptureWith(service);
+    expect(screen.queryByText(/plans left today/i)).not.toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText(/brain dump/i), "something");
+    await userEvent.click(screen.getByRole("button", { name: /plan it/i }));
+    expect(await screen.findByRole("button", { name: /add 2 tasks/i })).toBeInTheDocument();
+    expect(screen.queryByText(/out of ai plans for today/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/plans left today/i)).not.toBeInTheDocument();
+  });
+
+  it("increments the daily usage bucket after a successful organize", async () => {
+    localStorage.clear();
+    const service = new LocalAuthService();
+    const guest = service.startGuest();
+    renderCaptureWith(service);
+    await userEvent.type(screen.getByLabelText(/brain dump/i), "Gym this evening. Read design book.");
+    await userEvent.click(screen.getByRole("button", { name: /plan it/i }));
+    await screen.findByRole("button", { name: /add 2 tasks/i });
+    const stored = JSON.parse(localStorage.getItem(profileKey(USAGE_KEY, guest.id))!);
+    expect(stored.count).toBe(1);
   });
 });

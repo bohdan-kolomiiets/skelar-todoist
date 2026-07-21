@@ -1,11 +1,12 @@
 import type { AuthService, Profile, Registry, Tier } from "./types";
 import { profileKey } from "../profile/profileKey";
 import { TASKS_KEY } from "../storage/LocalTaskStore";
+import { USAGE_KEY } from "../usage/LocalUsageService";
 import { nowISO } from "../date/clock";
 
 const REGISTRY_KEY = "planner.profiles.v1";
-/** Base keys namespaced per profile. M1 has only tasks; M2 adds usage. */
-const PER_PROFILE_KEYS = [TASKS_KEY];
+/** Base keys namespaced per profile (copied on sign-in). */
+const PER_PROFILE_KEYS = [TASKS_KEY, USAGE_KEY];
 
 /**
  * localStorage-backed identity. Namespaces per-profile buckets via profileKey and

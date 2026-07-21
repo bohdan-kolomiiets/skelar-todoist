@@ -40,6 +40,6 @@ export default defineConfig({
         timeout: 120_000,
         // Force hermetic fake mode: an empty EDGE_CONFIG makes resolveAiMode() skip the
         // real Edge Config and fall through to AI_MODE=fake.
-        env: { ...process.env, EDGE_CONFIG: "", AI_MODE: "fake" },
+        env: { ...process.env, EDGE_CONFIG: "", AI_MODE: "fake", FREE_DAILY_INPUTS: "1" },
       },
 });

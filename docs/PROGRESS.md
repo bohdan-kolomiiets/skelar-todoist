@@ -21,14 +21,19 @@ single AA-verified accent (retired blue `#1f6fd0` → deep coral `#c2410c` via a
 swap), Tabler icons finished app-wide (Review/TaskRow/PriorityFlag/editor), minor controls
 neutralized (coral reserved for CTAs/active-tab/AI), and an `IconSparkles` on Plan it. Presentational
 only — core flow untouched.
-**Access ladder — M1 in review:** the guest→free→pro conversion funnel's first milestone (identity
-foundation + first-run gating + guest→free save nudge) is BUILT and in PR review — swappable
-`AuthService`/`LocalAuthService` (guest/free/pro profiles, per-profile localStorage buckets via
-`profileKey`, **copy-on-sign-in**, legacy adoption), `AuthProvider`/`useAuth`, profile-scoped task
-store (remount-per-profile), pre-guest → **Welcome** screen + passwordless `SignInForm`, Capture
-first-run gating (`hasOrganizedOnce`), and the guest→free **"save your plan"** nudge on first Save.
-Verified: unit **194**, e2e **7/7**, lint+typecheck clean; final opus review Ready-to-merge (0
-Critical/Important). **Next: access-ladder M2** (metering/Pro/Plans/Settings) or Dayspark Phase 2.
+**Access ladder — M1 shipped (PR #15, merged):** identity foundation + first-run gating +
+guest→free save nudge — swappable `AuthService`/`LocalAuthService` (guest/free/pro profiles,
+per-profile localStorage buckets via `profileKey`, **copy-on-sign-in**, legacy adoption),
+`AuthProvider`/`useAuth`, profile-scoped task store, pre-guest → **Welcome** + passwordless
+`SignInForm`, Capture first-run gating, guest→free **"save your plan"** nudge.
+**Access ladder — M2 in review:** metering + Pro (free→pro rung). Runtime `resolveFreeDailyInputs`
+(Edge Config→env→3), per-profile date-keyed **`UsageService`** (local-midnight reset, carried on
+sign-in), `/api/organize` echoes the limit, **`BillingService`** entitlements → `isPro`/`upgrade`/
+`downgrade` on `useAuth`, Capture **free→pro gate** (non-blocking pre-check) + `LimitReachedSheet`
++ "N left today" meter, `(account)` route group with **Plans** (fake upgrade/downgrade) + **Settings**
++ a gear entry in every primary header. Verified: unit **224**, e2e **8/8**, lint+typecheck clean;
+final opus review Ready-to-merge (0 Critical/Important). **Next: access-ladder M3** (voice waitlist)
+or Dayspark Phase 2.
 
 ## Done
 - [x] Git repo on `main`; GitHub remote (`github.com:bohdan-kolomiiets/skelar-todoist`)
@@ -132,14 +137,16 @@ Critical/Important). **Next: access-ladder M2** (metering/Pro/Plans/Settings) or
    (`hasOrganizedOnce`), exact empty-state copy, quick-add AI entry points, plus the deferred
    robustness items (client-tz `today` into `/api/organize`, empty-parse-result UX,
    deadline-badge tone) tracked in `.superpowers/sdd/progress.md`.
-3. **Access ladder (Plan 2) — M1 IN REVIEW; M2/M3 next.** M1 (identity foundation + first-run +
-   guest→free save nudge) is built & in PR. Spec:
-   [docs/superpowers/specs/2026-07-21-access-ladder-design.md](./superpowers/specs/2026-07-21-access-ladder-design.md);
-   plan (M1 full, M2/M3 outlined):
-   [docs/superpowers/plans/2026-07-21-access-ladder.md](./superpowers/plans/2026-07-21-access-ladder.md).
-   **M2** = `UsageService` daily metering + limit gate at `/api/organize` (returns `freeDailyInputs`) +
-   `BillingService`/entitlements + **Plans** + **Settings** + fake upgrade (free→pro). **M3** =
-   `WaitlistService` behind the voice mic teaser. Each is its own plan when reached.
+3. **Access ladder (Plan 2) — M1 SHIPPED (PR #15, merged), M2 IN REVIEW; M3 next.** Spec:
+   [docs/superpowers/specs/2026-07-21-access-ladder-design.md](./superpowers/specs/2026-07-21-access-ladder-design.md).
+   M1 plan: [.../2026-07-21-access-ladder.md](./superpowers/plans/2026-07-21-access-ladder.md);
+   M2 plan: [.../2026-07-22-access-ladder-m2.md](./superpowers/plans/2026-07-22-access-ladder-m2.md).
+   **M2** (built, in PR): `UsageService` daily metering + limit gate + `/api/organize` returns
+   `freeDailyInputs` + `BillingService`/entitlements + **Plans** + **Settings** + fake upgrade.
+   **M3** (next, own plan when reached) = `WaitlistService` behind the voice mic teaser. **Deferred
+   follow-ups** (from M1/M2 reviews, in `.superpowers/sdd/progress.md`): extract a `useIsHydrated()`
+   hook (the hydration trio is now in 4 files — do first in M3); PlansScreen pre-guest test +
+   Downgrade-button padding; client-tz `today` into `/api/organize`.
 
 ## Parked (revisit after Dayspark UI + Milestone C)
 - **AI doesn't infer relative-offset dates.** Manual test "I need to not forget to grab a

@@ -33,6 +33,11 @@ describe("TodayScreen", () => {
     expect(screen.getByText(/nothing planned/i)).toBeInTheDocument();
   });
 
+  it("shows a Settings gear linking to /settings", () => {
+    renderWith();
+    expect(screen.getByRole("link", { name: /settings/i })).toHaveAttribute("href", "/settings");
+  });
+
   it("lists today's tasks and a progress line", () => {
     const today = todayISO();
     const tasks = [createTask({ title: "Team standup", doDate: today, time: "09:00" }, { id: "a", order: 0 })];

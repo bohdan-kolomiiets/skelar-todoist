@@ -12,6 +12,7 @@ import type { Task, TaskDraft } from "@/lib/task/types";
 import { TaskRow } from "@/components/task/TaskRow";
 import { Chip } from "@/components/task/Chip";
 import { TaskEditorSheet } from "@/components/task/TaskEditorSheet";
+import { SettingsGear } from "@/components/nav/SettingsGear";
 
 export function InboxScreen() {
   const { tasks, addTask, updateTask, removeTask, toggleComplete, moveTask } = useTasks();
@@ -32,9 +33,12 @@ export function InboxScreen() {
 
   return (
     <section className="flex flex-1 flex-col px-4 pb-3">
-      <header className="pb-2 pt-4">
-        <h1 className="text-xl font-medium">Inbox</h1>
-        <p className="mt-0.5 text-[13px] text-text-secondary">{active.length} waiting</p>
+      <header className="flex items-start justify-between pb-2 pt-4">
+        <div>
+          <h1 className="text-xl font-medium">Inbox</h1>
+          <p className="mt-0.5 text-[13px] text-text-secondary">{active.length} waiting</p>
+        </div>
+        <SettingsGear />
       </header>
 
       {inboxAll.length === 0 ? (
