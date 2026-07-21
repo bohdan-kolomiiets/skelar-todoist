@@ -83,6 +83,21 @@ Critical/Important. Still open on #4: **P2/P3** (flow-UX + Tabler icons).
    deadline-badge tone) tracked in `.superpowers/sdd/progress.md`.
 5. **Plan 2** — access ladder, freemium metering, Plans/Settings/Welcome, voice fake-door.
 
+## Parked (revisit after Dayspark UI + Milestone C)
+- **AI doesn't infer relative-offset dates.** Manual test "I need to not forget to grab a
+  delivery **in 5 days**" → task "Grab delivery" with **no date** (routed to Inbox); the
+  "in 5 days" phrase is dropped, not parked. Root cause: `buildSystemPrompt`
+  ([src/lib/ai/prompt.ts](./../src/lib/ai/prompt.ts)) only exemplifies "tomorrow" / weekday
+  names for `doDate`, never offset phrases, so the model doesn't generalize (small models
+  follow the given examples closely). **Fix approach:** (1) add relative-offset rules to the
+  prompt — "in N days → +N", "next week / in a week → +7", "in N weeks → +7N", resolved against
+  the given today's date, into `doDate`; (2) teach the deterministic `FakeTaskParser.resolveDate`
+  the same "in N days" pattern (keeps fake mode + tests consistent); (3) add a golden case
+  (`in 5 days → doDate = today+5`) to `src/lib/ai/fixtures/parseCases.ts` so it's eval-verified
+  and regression-protected. **Caveat:** LLM date arithmetic is imperfect (gpt-4o-mini flubbed
+  "Friday" once; Haiku 4.5 is better) — for bulletproof dates, resolve the offset in code rather
+  than trusting the model. Est. ~M.
+
 ## Open decisions
 - **(Optional, low priority) Mock-AI fallback for local dev.** Once the AI route
   handler exists, consider having it fall back to a canned response when no key
