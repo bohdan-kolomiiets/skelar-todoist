@@ -17,8 +17,10 @@ interface Props {
 
 export function ReviewScreen({ proposal, onCommit, onStartOver }: Props) {
   const today = todayISO();
+  // Seeds once per mount; CaptureFlow only renders ReviewScreen while a proposal exists and passes through proposal=null on Start Over, so each review session is a fresh mount.
   const [items, setItems] = useState<ParsedTask[]>(proposal);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const todays = useMemo(() => items.filter((t) => t.doDate === today), [items, today]);
   const inbox = useMemo(() => items.filter((t) => t.doDate !== today), [items, today]);
@@ -32,7 +34,7 @@ export function ReviewScreen({ proposal, onCommit, onStartOver }: Props) {
     return (
       <div key={idx} className="rounded-xl border border-border bg-surface-2 p-3">
         <div className="flex items-start justify-between gap-2">
-          <button type="button" onClick={() => setEditingIndex(idx)} className="flex items-center gap-1.5 text-left text-[15px] font-medium">
+          <button type="button" onClick={() => setEditingIndex(idx)} className="flex min-h-11 items-center gap-1.5 text-left text-[15px] font-medium">
             {task.priority === "high" && <PriorityFlag />}
             {task.title}
           </button>
@@ -84,8 +86,11 @@ export function ReviewScreen({ proposal, onCommit, onStartOver }: Props) {
       <div className="flex flex-col gap-2 border-t border-border px-4 pb-4 pt-3">
         <button
           type="button"
-          onClick={() => onCommit(items)}
-          disabled={items.length === 0}
+          onClick={() => {
+            setSubmitting(true);
+            onCommit(items);
+          }}
+          disabled={items.length === 0 || submitting}
           className="w-full rounded-xl bg-fill-accent py-3 text-base font-medium text-on-accent disabled:opacity-50"
         >
           Add {items.length} {items.length === 1 ? "task" : "tasks"}

@@ -12,6 +12,7 @@ vi.mock("@/lib/ai/organizeClient", () => ({
 }));
 
 import { CaptureFlow } from "./CaptureFlow";
+import { organize } from "@/lib/ai/organizeClient";
 import { TaskStoreProvider } from "@/lib/tasks/TaskStoreProvider";
 import { MemoryTaskStore } from "@/lib/storage/MemoryTaskStore";
 
@@ -39,5 +40,15 @@ describe("CaptureFlow", () => {
   it("disables Plan it while the field is empty", () => {
     renderFlow();
     expect(screen.getByRole("button", { name: /plan it/i })).toBeDisabled();
+  });
+
+  it("shows an error and returns to idle when parsing fails", async () => {
+    vi.mocked(organize).mockRejectedValueOnce(new Error("Could not structure that. Try rephrasing."));
+    renderFlow();
+    await userEvent.type(screen.getByPlaceholderText(/what's on your mind/i), "Gym this evening.");
+    await userEvent.click(screen.getByRole("button", { name: /plan it/i }));
+    expect(await screen.findByText(/could not structure/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /plan it/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /add \d+ tasks?/i })).not.toBeInTheDocument();
   });
 });

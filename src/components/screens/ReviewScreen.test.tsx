@@ -29,4 +29,29 @@ describe("ReviewScreen", () => {
     await userEvent.click(screen.getByRole("button", { name: /add 2 tasks/i }));
     expect(onCommit).toHaveBeenCalledWith(proposal);
   });
+
+  it("guards against double-submit", async () => {
+    const onCommit = vi.fn();
+    render(<ReviewScreen proposal={proposal} onCommit={onCommit} onStartOver={vi.fn()} />);
+    const commitButton = screen.getByRole("button", { name: /add 2 tasks/i });
+    await userEvent.click(commitButton);
+    await userEvent.click(commitButton);
+    expect(onCommit).toHaveBeenCalledTimes(1);
+  });
+
+  it("toggles a task's placement between Today and Inbox", async () => {
+    render(<ReviewScreen proposal={proposal} onCommit={vi.fn()} onStartOver={vi.fn()} />);
+    await userEvent.click(screen.getByRole("button", { name: /Today/ }));
+    expect(screen.getByText(/inbox · 2/i)).toBeInTheDocument();
+  });
+
+  it("edits a task's title via the tap-to-edit sheet", async () => {
+    render(<ReviewScreen proposal={proposal} onCommit={vi.fn()} onStartOver={vi.fn()} />);
+    await userEvent.click(screen.getByText("Finish the pitch deck"));
+    const titleInput = screen.getByLabelText(/title/i);
+    await userEvent.clear(titleInput);
+    await userEvent.type(titleInput, "Finalize the pitch deck");
+    await userEvent.click(screen.getByRole("button", { name: /^done$/i }));
+    expect(screen.getByText("Finalize the pitch deck")).toBeInTheDocument();
+  });
 });
