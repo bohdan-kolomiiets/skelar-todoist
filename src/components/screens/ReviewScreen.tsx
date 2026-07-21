@@ -34,36 +34,52 @@ export function ReviewScreen({ proposal, onCommit, onStartOver, degraded = false
   const card = (task: ParsedTask) => {
     const idx = items.indexOf(task);
     return (
-      <div key={idx} className="rounded-xl border border-border bg-surface-2 p-3">
-        <div className="flex items-start justify-between gap-2">
-          <button type="button" onClick={() => setEditingIndex(idx)} className="flex min-h-11 items-center gap-1.5 text-left text-[15px] font-medium">
-            {task.priority === "high" && <PriorityFlag />}
-            {task.title}
-          </button>
-          <button
-            type="button"
-            aria-label="Remove"
-            onClick={() => removeAt(task)}
-            className="flex min-h-11 min-w-11 flex-shrink-0 items-center justify-center text-text-muted"
-          >
-            ✕
-          </button>
-        </div>
-        {(task.deadline || task.timeOfDay || (task.tags?.length ?? 0) > 0) && (
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {task.deadline && <DeadlineBadge deadline={task.deadline} today={today} />}
-            {task.timeOfDay && <TimeOfDayChip value={task.timeOfDay} />}
-            {task.tags?.map((t) => <Chip key={t}>{t}</Chip>)}
+      <div key={idx} className="relative rounded-xl border border-border bg-surface-2 p-3">
+        {/* Stretched edit affordance (issue #4 #3): a full-card button sits behind the
+            content so tapping anywhere opens the editor. The ✕ and placement pill are
+            sibling buttons layered above it — no nested interactive elements (a11y). */}
+        <button
+          type="button"
+          aria-label={`Edit ${task.title}`}
+          onClick={() => setEditingIndex(idx)}
+          className="absolute inset-0 z-0 rounded-xl"
+        />
+        <div className="pointer-events-none relative z-10">
+          <div className="flex items-start justify-between gap-2">
+            <span className="flex min-h-11 items-center gap-1.5 text-left text-[15px] font-medium">
+              {task.priority === "high" && <PriorityFlag />}
+              {task.title}
+            </span>
+            <button
+              type="button"
+              aria-label="Remove"
+              onClick={() => removeAt(task)}
+              className="pointer-events-auto flex min-h-11 min-w-11 flex-shrink-0 items-center justify-center text-text-muted"
+            >
+              ✕
+            </button>
           </div>
-        )}
-        <div className="mt-2.5">
-          <button
-            type="button"
-            onClick={() => togglePlacement(task)}
-            className="flex min-h-11 items-center rounded-full border border-border-strong bg-surface-1 px-2.5 text-xs"
-          >
-            {task.doDate === today ? "☀ Today ▾" : "📥 Inbox ▾"}
-          </button>
+          {(task.deadline || task.timeOfDay || (task.tags?.length ?? 0) > 0) && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {task.deadline && <DeadlineBadge deadline={task.deadline} today={today} />}
+              {task.timeOfDay && <TimeOfDayChip value={task.timeOfDay} />}
+              {task.tags?.map((t) => <Chip key={t}>{t}</Chip>)}
+            </div>
+          )}
+          <div className="mt-2.5">
+            <button
+              type="button"
+              onClick={() => togglePlacement(task)}
+              // Binary toggle, not a menu (issue #4 #4): keep the placement chip, swap the
+              // misleading ▾ for a ⇄. Accessible name states the move action but still leads
+              // with the visible word (WCAG 2.5.3 Label in Name). ⇄ → ti-arrows-exchange in P3.
+              aria-label={task.doDate === today ? "Today, move to Inbox" : "Inbox, move to Today"}
+              className="pointer-events-auto inline-flex min-h-11 items-center gap-1.5 rounded-full border border-border-strong bg-surface-1 px-2.5 text-xs"
+            >
+              {task.doDate === today ? "☀ Today" : "📥 Inbox"}
+              <span aria-hidden="true" className="text-text-muted">⇄</span>
+            </button>
+          </div>
         </div>
       </div>
     );

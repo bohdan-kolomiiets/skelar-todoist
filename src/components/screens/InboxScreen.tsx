@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useTasks } from "@/lib/tasks/useTasks";
+import { usePersistentState } from "@/lib/preferences/usePersistentState";
 import { viewOf } from "@/lib/task/routing";
 import { groupInbox } from "@/lib/task/ordering";
 import { todayISO } from "@/lib/date/clock";
@@ -15,7 +16,8 @@ export function InboxScreen() {
   const { tasks, addTask, updateTask, removeTask, toggleComplete, moveTask } = useTasks();
   const today = todayISO();
   const [editing, setEditing] = useState<Task | "new" | null>(null);
-  const [showCompleted, setShowCompleted] = useState(false);
+  // Persisted per-screen (issue #4 #5) so "Show" survives refresh / tab switch.
+  const [showCompleted, setShowCompleted] = usePersistentState("inbox.showCompleted", false);
 
   const inboxAll = useMemo(() => tasks.filter((t) => viewOf(t, today) === "inbox"), [tasks, today]);
   const active = useMemo(() => inboxAll.filter((t) => t.status === "active"), [inboxAll]);
@@ -68,7 +70,7 @@ export function InboxScreen() {
         <div className="mt-2 border-t border-border pt-2">
           <div className="flex items-center justify-between">
             <span className="text-[13px] font-medium text-text-secondary">Completed · {completed.length}</span>
-            <button type="button" onClick={() => setShowCompleted((s) => !s)} className="text-[13px] text-text-accent">
+            <button type="button" onClick={() => setShowCompleted(!showCompleted)} className="text-[13px] text-text-accent">
               {showCompleted ? "Hide" : "Show"}
             </button>
           </div>

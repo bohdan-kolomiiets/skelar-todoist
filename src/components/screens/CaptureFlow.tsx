@@ -45,9 +45,9 @@ export function CaptureFlow() {
           router.push("/today");
         }}
         onStartOver={() => {
+          // Keep `text` — the user may want to tweak the dump and re-run (issue #4 P2).
           setProposal(null);
           setDegraded(false);
-          setText("");
         }}
       />
     );

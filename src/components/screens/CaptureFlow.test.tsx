@@ -56,6 +56,16 @@ describe("CaptureFlow", () => {
     expect(screen.getByText(/temporarily unavailable/i)).toBeInTheDocument();
   });
 
+  it("keeps the brain-dump text after Start over so it can be tweaked and re-run", async () => {
+    const dump = "Gym this evening. Read design book.";
+    renderFlow();
+    await userEvent.type(screen.getByPlaceholderText(/what's on your mind/i), dump);
+    await userEvent.click(screen.getByRole("button", { name: /plan it/i }));
+    await userEvent.click(await screen.findByRole("button", { name: /start over/i }));
+    // Back in the composer with the original dump intact (not wiped).
+    expect(screen.getByPlaceholderText(/what's on your mind/i)).toHaveValue(dump);
+  });
+
   it("disables Plan it while the field is empty", () => {
     renderFlow();
     expect(screen.getByRole("button", { name: /plan it/i })).toBeDisabled();
