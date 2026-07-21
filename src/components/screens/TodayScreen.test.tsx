@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TodayScreen } from "./TodayScreen";
@@ -16,6 +16,8 @@ const renderWith = (tasks: Task[] = []) =>
   );
 
 describe("TodayScreen", () => {
+  beforeEach(() => localStorage.clear());
+
   it("shows the empty state when nothing is planned", () => {
     renderWith();
     expect(screen.getByText(/nothing planned/i)).toBeInTheDocument();
@@ -53,5 +55,21 @@ describe("TodayScreen", () => {
     await userEvent.click(screen.getByRole("button", { name: /show/i }));
     expect(screen.getByText("Done task")).toBeInTheDocument();
     expect(screen.getByText(/completed · 1/i)).toBeInTheDocument();
+  });
+
+  it("remembers the Completed section stays expanded across remounts", async () => {
+    const today = todayISO();
+    const task = createTask({ title: "Done task", doDate: today }, { id: "c", order: 0 });
+    task.status = "done";
+    task.completedAt = today;
+
+    const first = renderWith([task]);
+    await userEvent.click(screen.getByRole("button", { name: /show/i }));
+    first.unmount();
+
+    // Fresh mount (simulates a refresh / tab switch): the preference is remembered.
+    renderWith([task]);
+    expect(screen.getByText("Done task")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /hide/i })).toBeInTheDocument();
   });
 });

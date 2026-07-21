@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { InboxScreen } from "./InboxScreen";
@@ -15,6 +15,8 @@ const renderWith = (tasks: Task[] = []) =>
   );
 
 describe("InboxScreen", () => {
+  beforeEach(() => localStorage.clear());
+
   it("shows the empty state at inbox zero", () => {
     renderWith();
     expect(screen.getByText(/inbox zero/i)).toBeInTheDocument();
@@ -40,5 +42,20 @@ describe("InboxScreen", () => {
     expect(screen.queryByText("Learn guitar")).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: /show/i }));
     expect(screen.getByText("Learn guitar")).toBeInTheDocument();
+  });
+
+  it("remembers the Completed section stays expanded across remounts", async () => {
+    const task = createTask({ title: "Learn guitar", doDate: null }, { id: "s1", order: 1 });
+    task.status = "done";
+    task.completedAt = "2026-07-21T10:00:00.000Z";
+
+    const first = renderWith([task]);
+    await userEvent.click(screen.getByRole("button", { name: /show/i }));
+    first.unmount();
+
+    // Fresh mount (simulates a refresh / tab switch): the preference is remembered.
+    renderWith([task]);
+    expect(screen.getByText("Learn guitar")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /hide/i })).toBeInTheDocument();
   });
 });
