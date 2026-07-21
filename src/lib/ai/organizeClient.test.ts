@@ -30,4 +30,20 @@ describe("organize", () => {
     );
     await expect(organize("  ")).rejects.toThrow(/enter something/i);
   });
+
+  it("returns freeDailyInputs from the response", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ tasks: [], degraded: false, freeDailyInputs: 5 }), { status: 200 }),
+    );
+    const result = await organize("hi");
+    expect(result.freeDailyInputs).toBe(5);
+  });
+
+  it("defaults freeDailyInputs to 3 when the field is absent", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ tasks: [], degraded: false }), { status: 200 }),
+    );
+    const result = await organize("hi");
+    expect(result.freeDailyInputs).toBe(3);
+  });
 });

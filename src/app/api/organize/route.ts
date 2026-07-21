@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { resolveAiMode, resolveAiModel } from "@/lib/ai/mode";
+import { resolveFreeDailyInputs } from "@/lib/ai/limits";
 import { parsedTasksSchema } from "@/lib/ai/schema";
 import { FakeTaskParser } from "@/lib/ai/fakeParser";
 import { GatewayTaskParser } from "@/lib/ai/gatewayParser";
@@ -24,6 +25,7 @@ export async function POST(request: Request): Promise<Response> {
   console.log(`[/api/organize] aiMode=${mode}`);
 
   try {
+    const freeDailyInputs = await resolveFreeDailyInputs();
     let parsed: ParsedTask[];
     let degraded = false;
     if (mode === "real") {
@@ -43,7 +45,7 @@ export async function POST(request: Request): Promise<Response> {
       parsed = await new FakeTaskParser().parse(text);
     }
     const tasks = parsedTasksSchema.parse(parsed); // enforce the contract before it reaches the client
-    return NextResponse.json({ tasks, degraded });
+    return NextResponse.json({ tasks, degraded, freeDailyInputs });
   } catch (err) {
     // Reached only when the deterministic fallback itself fails — a genuine internal
     // problem, not bad user input. Don't tell the user to "rephrase".

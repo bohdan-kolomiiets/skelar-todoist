@@ -92,6 +92,7 @@ describe("CaptureFlow", () => {
     vi.mocked(organize).mockResolvedValueOnce({
       tasks: [{ title: "Gym", doDate: null, timeOfDay: "evening" }],
       degraded: true,
+      freeDailyInputs: 3,
     });
     renderCapture();
     await userEvent.type(screen.getByPlaceholderText(/what's on your mind/i), "Gym this evening.");
