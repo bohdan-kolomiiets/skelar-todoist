@@ -28,6 +28,7 @@ export function AuthProvider({ service, children }: { service?: AuthService; chi
   const [loaded, setLoaded] = useState(false);
 
   // Load the real profile exactly once, right after hydration commits (no effect setState).
+  // Hydration-safe load (see TaskStoreProvider.tsx for the full rationale): never setState in an effect (react-hooks/set-state-in-effect).
   if (isHydrated && !loaded) {
     setLoaded(true);
     setProfile(active.current());

@@ -25,6 +25,7 @@ export function WelcomeScreen() {
       {signingIn ? (
         <SignInForm
           autoFocus
+          submitLabel="Continue"
           onSubmit={(emailOrName) => {
             auth.signIn({ emailOrName });
             router.push("/capture");
