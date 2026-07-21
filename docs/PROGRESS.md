@@ -117,6 +117,11 @@ auto-deploys), then set Edge Config `aiMode = "real"` for production; then Miles
     validation schema; `createTask` normalizes the nulls with `??`. **Note:** the free tier also
     **rate-limits** gpt-4o-mini under bursts (`GatewayRateLimitError`) — fine for single-user
     demo taps, and covered by the fallback below regardless.
+  - **Runtime provider/model switch (issue #4):** new Edge Config `aiModel`
+    (`Edge Config → env AI_MODEL → default openai/gpt-4o-mini`) picks the real-mode
+    gateway slug. `anthropic/*` slugs route on the user's **own Anthropic account**
+    via request-scoped BYOK (`AI_API_KEY` → `providerOptions.gateway.byok`), bypassing
+    the free-tier 403 + rate limits. Prod: set `aiModel = anthropic/claude-haiku-4.5`.
   - **Resilience (issue #4 P1):** if the real parser fails for any reason (gateway/model/
     rate-limit/timeout), `/api/organize` **falls back to `FakeTaskParser`** and returns
     `{ tasks, degraded: true }`; the Review screen shows an honest "AI temporarily unavailable —
