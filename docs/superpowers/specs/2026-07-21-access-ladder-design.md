@@ -216,8 +216,9 @@ Welcome's "What's included."
 ### Settings — `/settings` (M2)
 
 Account line by tier — guest → "Sign in to save"; free → name/email + "Upgrade"; pro → "Pro".
-Plan status → Plans. The **show/hide completed** preference (§11). A guidance / Tips link. Small
-entry point (gear) from the app header.
+Plan status → Plans. A guidance / Tips link. Small entry point (gear) from the app header.
+**Show/hide completed stays a per-screen toggle** (Today/Inbox, as built) — not centralized
+into Settings.
 
 ### Routing summary
 
