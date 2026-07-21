@@ -16,11 +16,12 @@ pill reads as a ⇄ toggle, the Completed toggle persists (localStorage seam). P
 `@tabler/icons-react` app-wide (tab bar + composer), fixed the example-chip overlap, and shipped a real
 **Tips guide sheet** + a tappable **mic voice teaser** (fake-door; waitlist deferred to Plan 2) on a
 shared `BottomSheet`. Verified: unit **147**, e2e **4/4**, lint+typecheck clean.
-**Dayspark brand shipped (Phase 0, branch `feat/dayspark-brand-assets`):** name/logo, Capture
-wordmark header, `next/og` OG share image + Twitter card, SVG favicon, Apple/PWA icons, PWA
-manifest, page metadata; warm gold→coral brand tokens added additively (existing surfaces + blue
-accent unchanged). **Next: Dayspark UI/UX redesign — Phase 1** (coral accent, Tabler icons
-app-wide) or Milestone C.
+**Dayspark shipped:** Phase 0 brand assets (PR #12) + **Phase 1 UI (PR #14)** — coral is now the
+single AA-verified accent (retired blue `#1f6fd0` → deep coral `#c2410c` via a single-source token
+swap), Tabler icons finished app-wide (Review/TaskRow/PriorityFlag/editor), minor controls
+neutralized (coral reserved for CTAs/active-tab/AI), and an `IconSparkles` on Plan it. Presentational
+only — core flow untouched. **Next: Dayspark Phase 2** (per-screen "moments"/motion/empty-states) or
+Milestone C.
 
 ## Done
 - [x] Git repo on `main`; GitHub remote (`github.com:bohdan-kolomiiets/skelar-todoist`)
@@ -102,12 +103,24 @@ app-wide) or Milestone C.
   review passed (merge-with-small-fixes: Inbox §11 Completed toggle, 44px touch targets,
   `.env.example` refresh, hermetic e2e). Non-blocking follow-ups tracked in
   `.superpowers/sdd/progress.md`.
+- [x] **Dayspark UI — Phase 1: coral accent + Tabler icons** (subagent-driven TDD, 6 tasks, PR #14;
+  spec+plan from PR #13). Retired the lone blue accent for one AA-verified **deep coral `#c2410c`** via
+  a **single-source token swap** in `globals.css` (the ~9 accent call sites recolor automatically);
+  finished **`@tabler/icons-react`** app-wide (Review remove/placement-pill/headers, TaskRow check+move,
+  PriorityFlag, editor close); **neutralized minor controls** (Show-completed toggles, editor Done) so
+  coral stays reserved for CTAs/active-tab/AI; added **`IconSparkles`** to the Plan it action. Bright
+  `#ff6a3d` stays decorative; Geist kept. **Presentational only** — no core-flow/storage/AI/routing/schema
+  changes. Whole-branch review (opus): ready to merge, 0 Critical/Important. Sweep green: unit **167**,
+  e2e green on CI, lint+typecheck clean. **Follow-up (non-blocking):** the Plan-it test asserts only
+  `<svg>`-presence (doesn't distinguish the spark — kept as-is by decision); per-screen
+  moments/motion/empty-states → Phase 2/3.
 
 ## Next (in order)
-1. **Dayspark UI/UX redesign — Phase 1** — coral becomes the primary accent (retire/demote the blue
-   `#1f6fd0`), Tabler icons app-wide, per-screen brand polish. Roadmap:
+1. **Dayspark UI — Phase 2/3** — per-screen "moments" (Capture/Review chaos→clarity reveal, "N sorted
+   into your day"), empty-state redesigns, sun/spark micro-animations, optional display font, raster
+   192/512 PWA icons. Roadmap:
    [docs/superpowers/specs/2026-07-21-dayspark-ui-redesign-roadmap.md](./superpowers/specs/2026-07-21-dayspark-ui-redesign-roadmap.md).
-   Needs its own brainstorm → plan (net-new design). Overlaps issue #4 P2/P3.
+   Needs its own brainstorm → plan. Overlaps issue #4 P2/P3.
 2. **Milestone C** — needs-a-date (the additive `needsDate` flag), first-run onboarding
    (`hasOrganizedOnce`), exact empty-state copy, quick-add AI entry points, plus the deferred
    robustness items (client-tz `today` into `/api/organize`, empty-parse-result UX,
