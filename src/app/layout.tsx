@@ -1,5 +1,5 @@
-import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { daysparkMetadata, daysparkViewport } from "./metadata";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,16 +12,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "AI Day Planner",
-  description: "Brain-dump your day. AI turns the chaos into a clear plan.",
-};
-
-// Mobile-first: fit device width, keep pinch-zoom for accessibility.
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-};
+export const metadata = daysparkMetadata;
+export const viewport = daysparkViewport;
 
 export default function RootLayout({
   children,

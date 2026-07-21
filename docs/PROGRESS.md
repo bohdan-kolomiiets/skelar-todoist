@@ -15,7 +15,12 @@ Config `aiModel`. Any real-parser failure degrades to the fake parser with an ho
 pill reads as a ⇄ toggle, the Completed toggle persists (localStorage seam). P3 = adopted
 `@tabler/icons-react` app-wide (tab bar + composer), fixed the example-chip overlap, and shipped a real
 **Tips guide sheet** + a tappable **mic voice teaser** (fake-door; waitlist deferred to Plan 2) on a
-shared `BottomSheet`. Verified: unit **147**, e2e **4/4**, lint+typecheck clean. **Next: Dayspark brand.**
+shared `BottomSheet`. Verified: unit **147**, e2e **4/4**, lint+typecheck clean.
+**Dayspark brand shipped (Phase 0, branch `feat/dayspark-brand-assets`):** name/logo, Capture
+wordmark header, `next/og` OG share image + Twitter card, SVG favicon, Apple/PWA icons, PWA
+manifest, page metadata; warm gold→coral brand tokens added additively (existing surfaces + blue
+accent unchanged). **Next: Dayspark UI/UX redesign — Phase 1** (coral accent, Tabler icons
+app-wide) or Milestone C.
 
 ## Done
 - [x] Git repo on `main`; GitHub remote (`github.com:bohdan-kolomiiets/skelar-todoist`)
@@ -71,6 +76,19 @@ shared `BottomSheet`. Verified: unit **147**, e2e **4/4**, lint+typecheck clean.
   for a set, non-today do-date (today's tasks sit under the "☀ Today" header, so no redundant
   chip), matching how the committed Inbox surfaces scheduled dates. New regression test; sweep
   green: unit **155**, e2e **4/4**, lint+typecheck clean; verified in-browser.
+- [x] **Dayspark brand assets — Phase 0** (subagent-driven TDD, branch `feat/dayspark-brand-assets`;
+  design spec + plan from PR #6). Branded the app **Dayspark**: a `src/components/brand/` module
+  (four-point spark **mark**, warm **badge**, **wordmark**) is the single source that drives both the
+  in-app **Capture wordmark header** and the generated assets via `next/og` + Next file conventions —
+  a 1200×630 **OG share image** (warm gold→coral card, so shared links stop previewing text-only) +
+  Twitter card, a 180 **Apple touch icon**, an SVG **favicon** (`icon.svg`, replacing the scaffold
+  `favicon.ico`), a **PWA manifest**, and page **metadata** (title/description/`metadataBase`/coral
+  theme color). Warm brand tokens are additive — existing muted surfaces + the blue accent are
+  untouched. Whole-branch review (opus): ready to merge, 0 Critical/Important. Sweep green: unit
+  **162**, e2e **6/6**, lint+typecheck clean. **Follow-up:** eyeball the live OG card on the Vercel
+  preview (opengraph.xyz) — the card wordmark uses `next/og`'s default Geist weight, so confirm the
+  800 weight actually renders bold (else bundle a weight or outline the text, per spec §7). Next
+  Dayspark step: **UI/UX redesign Phase 1** (roadmap `2026-07-21-dayspark-ui-redesign-roadmap.md`).
 - [x] **Phase 2 — core flow implemented** (subagent-driven TDD, branch `feat/core-flow`, 31
   commits). Milestone A: Task model + `createTask`, injectable clock + deadline/do-date
   formatting, Today/Inbox routing + ordering/grouping, swappable `TaskStore`
@@ -86,8 +104,10 @@ shared `BottomSheet`. Verified: unit **147**, e2e **4/4**, lint+typecheck clean.
   `.superpowers/sdd/progress.md`.
 
 ## Next (in order)
-1. **Dayspark brand UI/UX** — implement the approved spec (PR #6): brand/logo, wordmark, OG image,
-   favicons, PWA manifest, metadata.
+1. **Dayspark UI/UX redesign — Phase 1** — coral becomes the primary accent (retire/demote the blue
+   `#1f6fd0`), Tabler icons app-wide, per-screen brand polish. Roadmap:
+   [docs/superpowers/specs/2026-07-21-dayspark-ui-redesign-roadmap.md](./superpowers/specs/2026-07-21-dayspark-ui-redesign-roadmap.md).
+   Needs its own brainstorm → plan (net-new design). Overlaps issue #4 P2/P3.
 2. **Milestone C** — needs-a-date (the additive `needsDate` flag), first-run onboarding
    (`hasOrganizedOnce`), exact empty-state copy, quick-add AI entry points, plus the deferred
    robustness items (client-tz `today` into `/api/organize`, empty-parse-result UX,

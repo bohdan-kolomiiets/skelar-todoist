@@ -35,6 +35,14 @@
   --color-border-danger: #e6a6a4;
 }
 
+/* Dayspark brand palette (docs/brand). Additive; existing surfaces unchanged. */
+@theme {
+  --color-brand-gold: #ffb43c;
+  --color-brand-coral: #ff6a3d;
+  --color-brand-coral-deep: #ff5e5e;
+  --color-brand-cream: #fdf8ee;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
