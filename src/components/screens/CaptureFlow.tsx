@@ -195,7 +195,10 @@ export function CaptureFlow() {
         </p>
       )}
       <TipsSheet open={tipsOpen} onClose={() => setTipsOpen(false)} />
-      <VoiceComingSoonSheet open={voiceOpen} onClose={() => setVoiceOpen(false)} />
+      {/* Mounted only while open (not always-mounted like TipsSheet/LimitReachedSheet) so
+          each open is a fresh mount — the sheet's joined-state initializer genuinely
+          re-reads storage every time, instead of running once at CaptureFlow mount. */}
+      {voiceOpen && <VoiceComingSoonSheet open onClose={() => setVoiceOpen(false)} />}
       <LimitReachedSheet open={limitOpen} onClose={() => setLimitOpen(false)} used={used} limit={limit} />
     </section>
   );
