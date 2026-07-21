@@ -9,6 +9,7 @@ import { VoiceComingSoonSheet } from "@/components/capture/VoiceComingSoonSheet"
 import { organize } from "@/lib/ai/organizeClient";
 import { useTasks } from "@/lib/tasks/useTasks";
 import { useAuth } from "@/lib/auth/useAuth";
+import { useSaveNudge } from "@/lib/nudge/useSaveNudge";
 import type { ParsedTask } from "@/lib/task/types";
 import { ReviewScreen } from "./ReviewScreen";
 
@@ -21,6 +22,7 @@ export function CaptureFlow() {
   const router = useRouter();
   const { addTasks } = useTasks();
   const { profile, markOrganized } = useAuth();
+  const { notifySaved } = useSaveNudge();
   const [text, setText] = useState("");
   const [proposal, setProposal] = useState<ParsedTask[] | null>(null);
   const [degraded, setDegraded] = useState(false);
@@ -52,6 +54,7 @@ export function CaptureFlow() {
         degraded={degraded}
         onCommit={(tasks) => {
           addTasks(tasks);
+          notifySaved();
           router.push("/today");
         }}
         onStartOver={() => {

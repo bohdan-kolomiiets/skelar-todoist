@@ -20,15 +20,18 @@ import { TaskStoreProvider } from "@/lib/tasks/TaskStoreProvider";
 import { MemoryTaskStore } from "@/lib/storage/MemoryTaskStore";
 import { AuthProvider } from "@/lib/auth/AuthProvider";
 import { LocalAuthService } from "@/lib/auth/LocalAuthService";
+import { SaveNudgeProvider } from "@/lib/nudge/SaveNudgeProvider";
 
 function renderCapture() {
   const service = new LocalAuthService();
   service.startGuest();
   return render(
     <AuthProvider service={service}>
-      <TaskStoreProvider store={new MemoryTaskStore()}>
-        <CaptureFlow />
-      </TaskStoreProvider>
+      <SaveNudgeProvider>
+        <TaskStoreProvider store={new MemoryTaskStore()}>
+          <CaptureFlow />
+        </TaskStoreProvider>
+      </SaveNudgeProvider>
     </AuthProvider>,
   );
 }
@@ -143,9 +146,11 @@ describe("CaptureFlow", () => {
     service.markOrganized();
     render(
       <AuthProvider service={service}>
-        <TaskStoreProvider store={new MemoryTaskStore()}>
-          <CaptureFlow />
-        </TaskStoreProvider>
+        <SaveNudgeProvider>
+          <TaskStoreProvider store={new MemoryTaskStore()}>
+            <CaptureFlow />
+          </TaskStoreProvider>
+        </SaveNudgeProvider>
       </AuthProvider>,
     );
     expect(screen.queryByRole("button", { name: /try an example/i })).not.toBeInTheDocument();

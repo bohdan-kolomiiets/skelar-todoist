@@ -5,14 +5,24 @@ import { InboxScreen } from "./InboxScreen";
 import { TaskStoreProvider } from "@/lib/tasks/TaskStoreProvider";
 import { MemoryTaskStore } from "@/lib/storage/MemoryTaskStore";
 import { createTask } from "@/lib/task/createTask";
+import { AuthProvider } from "@/lib/auth/AuthProvider";
+import { LocalAuthService } from "@/lib/auth/LocalAuthService";
+import { SaveNudgeProvider } from "@/lib/nudge/SaveNudgeProvider";
 import type { Task } from "@/lib/task/types";
 
-const renderWith = (tasks: Task[] = []) =>
-  render(
-    <TaskStoreProvider store={new MemoryTaskStore(tasks)}>
-      <InboxScreen />
-    </TaskStoreProvider>,
+const renderWith = (tasks: Task[] = []) => {
+  const service = new LocalAuthService();
+  service.startGuest();
+  return render(
+    <AuthProvider service={service}>
+      <SaveNudgeProvider>
+        <TaskStoreProvider store={new MemoryTaskStore(tasks)}>
+          <InboxScreen />
+        </TaskStoreProvider>
+      </SaveNudgeProvider>
+    </AuthProvider>,
   );
+};
 
 describe("InboxScreen", () => {
   beforeEach(() => localStorage.clear());
