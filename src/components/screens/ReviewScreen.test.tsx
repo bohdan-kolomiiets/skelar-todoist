@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ReviewScreen } from "./ReviewScreen";
 import { todayISO } from "@/lib/date/clock";
@@ -17,10 +17,24 @@ describe("ReviewScreen", () => {
     expect(screen.getByRole("button", { name: /add 2 tasks/i })).toBeInTheDocument();
   });
 
-  it("removing a card updates the count and commit label", async () => {
+  it("asks for confirmation before removing, then updates the count and commit label", async () => {
     render(<ReviewScreen proposal={proposal} onCommit={vi.fn()} onStartOver={vi.fn()} />);
-    await userEvent.click(screen.getAllByRole("button", { name: /remove/i })[0]);
+    await userEvent.click(screen.getByRole("button", { name: /remove finish the pitch deck/i }));
+    // The ✕ opens a confirmation — the task is NOT gone yet.
+    const dialog = screen.getByRole("dialog", { name: /remove this task/i });
+    expect(within(dialog).getByText("Finish the pitch deck")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /add 2 tasks/i })).toBeInTheDocument();
+    // Confirming the dialog performs the removal.
+    await userEvent.click(within(dialog).getByRole("button", { name: "Remove" }));
     expect(screen.getByRole("button", { name: /add 1 task$/i })).toBeInTheDocument();
+  });
+
+  it("keeps the task when the removal is canceled", async () => {
+    render(<ReviewScreen proposal={proposal} onCommit={vi.fn()} onStartOver={vi.fn()} />);
+    await userEvent.click(screen.getByRole("button", { name: /remove finish the pitch deck/i }));
+    await userEvent.click(screen.getByRole("button", { name: /cancel/i }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /add 2 tasks/i })).toBeInTheDocument();
   });
 
   it("commits the edited proposal", async () => {
@@ -65,7 +79,11 @@ describe("ReviewScreen", () => {
 
   it("removing a card does not also open the editor", async () => {
     render(<ReviewScreen proposal={proposal} onCommit={vi.fn()} onStartOver={vi.fn()} />);
-    await userEvent.click(screen.getAllByRole("button", { name: /remove/i })[0]);
+    await userEvent.click(screen.getByRole("button", { name: /remove finish the pitch deck/i }));
+    // The ✕ opens the confirm dialog, not the task editor…
+    expect(screen.queryByLabelText(/title/i)).not.toBeInTheDocument();
+    // …and confirming the removal still doesn't open it.
+    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Remove" }));
     expect(screen.queryByLabelText(/title/i)).not.toBeInTheDocument();
   });
 

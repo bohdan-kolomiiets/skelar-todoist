@@ -8,6 +8,7 @@ import { PriorityFlag } from "@/components/task/PriorityFlag";
 import { TimeOfDayChip } from "@/components/task/TimeOfDayChip";
 import { DeadlineBadge } from "@/components/task/DeadlineBadge";
 import { TaskEditorSheet } from "@/components/task/TaskEditorSheet";
+import { ConfirmSheet } from "@/components/ui/ConfirmSheet";
 
 interface Props {
   proposal: ParsedTask[];
@@ -22,6 +23,7 @@ export function ReviewScreen({ proposal, onCommit, onStartOver, degraded = false
   // Seeds once per mount; CaptureFlow only renders ReviewScreen while a proposal exists and passes through proposal=null on Start Over, so each review session is a fresh mount.
   const [items, setItems] = useState<ParsedTask[]>(proposal);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [pendingRemoval, setPendingRemoval] = useState<ParsedTask | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const todays = useMemo(() => items.filter((t) => t.doDate === today), [items, today]);
@@ -52,8 +54,8 @@ export function ReviewScreen({ proposal, onCommit, onStartOver, degraded = false
             </span>
             <button
               type="button"
-              aria-label="Remove"
-              onClick={() => removeAt(task)}
+              aria-label={`Remove ${task.title}`}
+              onClick={() => setPendingRemoval(task)}
               className="pointer-events-auto flex min-h-11 min-w-11 flex-shrink-0 items-center justify-center text-text-muted"
             >
               ✕
@@ -137,6 +139,20 @@ export function ReviewScreen({ proposal, onCommit, onStartOver, degraded = false
           }}
         />
       )}
+
+      {/* Guard accidental taps on the card ✕ (issue: easy to lose a proposed task). */}
+      <ConfirmSheet
+        open={pendingRemoval !== null}
+        title="Remove this task?"
+        description={pendingRemoval?.title}
+        confirmLabel="Remove"
+        destructive
+        onConfirm={() => {
+          if (pendingRemoval) removeAt(pendingRemoval);
+          setPendingRemoval(null);
+        }}
+        onCancel={() => setPendingRemoval(null)}
+      />
     </section>
   );
 }
