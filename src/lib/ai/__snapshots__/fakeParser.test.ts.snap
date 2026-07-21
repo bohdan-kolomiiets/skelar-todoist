@@ -1,0 +1,32 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`FakeTaskParser (golden dataset) > is deterministic + regression-locked (snapshot) 1`] = `
+[
+  {
+    "deadline": "2026-07-24",
+    "doDate": "2026-07-20",
+    "priority": "none",
+    "tags": [],
+    "title": "Finish the pitch deck",
+  },
+  {
+    "doDate": "2026-07-20",
+    "priority": "none",
+    "tags": [],
+    "timeOfDay": "evening",
+    "title": "Gym",
+  },
+  {
+    "doDate": "2026-07-20",
+    "priority": "high",
+    "tags": [],
+    "title": "Reply to Anna",
+  },
+  {
+    "doDate": null,
+    "priority": "none",
+    "tags": [],
+    "title": "Read that design book",
+  },
+]
+`;

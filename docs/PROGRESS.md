@@ -3,13 +3,15 @@
 > Living status for the project. **Update at the end of each working session** —
 > move items from Next → Done, record new decisions, note the next concrete step.
 >
-> Last updated: 2026-07-20
+> Last updated: 2026-07-21
 
 ## Current phase
-Phase 1 (product spec / brainstorm) **complete**; **implementation plan for the core flow
-written** → [docs/superpowers/plans/2026-07-20-core-flow.md](./superpowers/plans/2026-07-20-core-flow.md)
-(19 bite-sized TDD tasks, 2 deployable milestones). Next: **Phase 2 — execute the plan**,
-starting with Milestone A (the manual-planner substrate), one vertical slice at a time.
+**Phase 2 — core flow IMPLEMENTED.** Both milestones of the plan are built on branch
+`feat/core-flow` via subagent-driven TDD (per-task implement → review → fix, then a
+whole-branch review). **The graded MVP works end-to-end** (brain dump → AI structures it
+into tasks → review → save → a "Today" plan). Full sweep green: lint, typecheck, unit
+**104**, e2e **4/4** (deterministic fake mode). Next: PR → merge to `main` (Vercel
+auto-deploys), then set Edge Config `aiMode = "real"` for production; then Milestone C.
 
 ## Done
 - [x] Git repo on `main`; GitHub remote (`github.com:bohdan-kolomiiets/skelar-todoist`)
@@ -51,13 +53,30 @@ starting with Milestone A (the manual-planner substrate), one vertical slice at 
   (model → storage → Today/Inbox → editor), **B** = AI capture (parser → `/api/organize` →
   Capture → Review → deterministic e2e). Milestone C (edge/empty/onboarding) + Plan 2
   (auth/freemium/voice) outlined for later.
+- [x] **Phase 2 — core flow implemented** (subagent-driven TDD, branch `feat/core-flow`, 31
+  commits). Milestone A: Task model + `createTask`, injectable clock + deadline/do-date
+  formatting, Today/Inbox routing + ordering/grouping, swappable `TaskStore`
+  (localStorage/memory), `TaskStoreProvider` + `useTasks` (SSR-safe hydration,
+  functional-update commit), design tokens + app shell + landing redirect, `TaskRow` +
+  display primitives, shared `TaskEditorSheet`, Today + Inbox screens. Milestone B: zod parse
+  contract + `TaskParser` interface + prompt, deterministic `FakeTaskParser` + golden dataset,
+  real `GatewayTaskParser` (AI SDK v7 + Vercel AI Gateway, OIDC), `POST /api/organize` with
+  Edge-Config `aiMode` (fake/real) + server-only guard, `organize()` client wrapper, Capture
+  composer + Review flow, deterministic Playwright e2e of the graded scenario. Whole-branch
+  review passed (merge-with-small-fixes: Inbox §11 Completed toggle, 44px touch targets,
+  `.env.example` refresh, hermetic e2e). Non-blocking follow-ups tracked in
+  `.superpowers/sdd/progress.md`.
 
 ## Next (in order)
-1. **Phase 2 — execute the core-flow plan**, Milestone A first (Tasks 1–11 → deployable
-   manual planner), then Milestone B (Tasks 12–19 → graded AI flow). TDD, one slice at a
-   time. Execution mode TBD (subagent-driven vs inline).
-2. **Milestone C** — needs-a-date, first-run onboarding, exact empty-state copy, quick-add
-   AI entry points (polish on the working core).
+1. **Merge `feat/core-flow`** (PR → `main`; branch protection requires a PR). Vercel
+   auto-deploys. Then in the Vercel dashboard set Edge Config `aiMode = "real"` for production
+   (AI Gateway OIDC is automatic on deploys — no secret to set) and smoke-test the live graded
+   flow on a phone with an original dump. Instant safe fallback if the live model misbehaves:
+   flip `aiMode` back to `"fake"` — no redeploy.
+2. **Milestone C** — needs-a-date (the additive `needsDate` flag), first-run onboarding
+   (`hasOrganizedOnce`), exact empty-state copy, quick-add AI entry points, plus the deferred
+   robustness items (client-tz `today` into `/api/organize`, empty-parse-result UX,
+   deadline-badge tone) tracked in `.superpowers/sdd/progress.md`.
 3. **Plan 2** — access ladder, freemium metering, Plans/Settings/Welcome, voice fake-door.
 
 ## Open decisions
