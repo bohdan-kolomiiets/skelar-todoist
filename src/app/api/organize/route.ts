@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { resolveAiMode } from "@/lib/ai/mode";
+import { resolveAiMode, resolveAiModel } from "@/lib/ai/mode";
 import { parsedTasksSchema } from "@/lib/ai/schema";
 import { FakeTaskParser } from "@/lib/ai/fakeParser";
 import { GatewayTaskParser } from "@/lib/ai/gatewayParser";
-import type { TaskParser } from "@/lib/ai/parser";
+import type { ParsedTask } from "@/lib/task/types";
 
 /**
  * The AI parse boundary. Secrets/credentials live here, never client-side.
@@ -24,12 +24,33 @@ export async function POST(request: Request): Promise<Response> {
   console.log(`[/api/organize] aiMode=${mode}`);
 
   try {
-    const parser: TaskParser = mode === "real" ? new GatewayTaskParser() : new FakeTaskParser();
-    const parsed = await parser.parse(text);
+    let parsed: ParsedTask[];
+    let degraded = false;
+    if (mode === "real") {
+      const model = await resolveAiModel();
+      console.log(`[/api/organize] aiModel=${model}`);
+      try {
+        parsed = await new GatewayTaskParser({ model, apiKey: process.env.AI_API_KEY }).parse(text);
+      } catch (err) {
+        // Real AI unavailable (gateway/model/billing/timeout). Stay demo-safe:
+        // fall back to the deterministic parser so the user still gets a plan,
+        // and flag it so the UI can be honest instead of failing outright.
+        console.error("[/api/organize] real parser unavailable — falling back to fake:", err);
+        parsed = await new FakeTaskParser().parse(text);
+        degraded = true;
+      }
+    } else {
+      parsed = await new FakeTaskParser().parse(text);
+    }
     const tasks = parsedTasksSchema.parse(parsed); // enforce the contract before it reaches the client
-    return NextResponse.json({ tasks });
+    return NextResponse.json({ tasks, degraded });
   } catch (err) {
+    // Reached only when the deterministic fallback itself fails — a genuine internal
+    // problem, not bad user input. Don't tell the user to "rephrase".
     console.error(`[/api/organize] parse failed (aiMode=${mode}):`, err);
-    return NextResponse.json({ error: "Could not structure that. Try rephrasing." }, { status: 502 });
+    return NextResponse.json(
+      { error: "Something went wrong organizing that. Please try again." },
+      { status: 502 },
+    );
   }
 }

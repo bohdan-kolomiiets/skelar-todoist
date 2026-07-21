@@ -4,12 +4,24 @@ import { organize } from "./organizeClient";
 afterEach(() => vi.restoreAllMocks());
 
 describe("organize", () => {
-  it("returns tasks on success", async () => {
+  it("returns tasks (not degraded) on success", async () => {
     vi.spyOn(global, "fetch").mockResolvedValue(
-      new Response(JSON.stringify({ tasks: [{ title: "Gym", timeOfDay: "evening" }] }), { status: 200 }),
+      new Response(JSON.stringify({ tasks: [{ title: "Gym", timeOfDay: "evening" }], degraded: false }), {
+        status: 200,
+      }),
     );
-    const tasks = await organize("Gym this evening");
-    expect(tasks).toEqual([{ title: "Gym", timeOfDay: "evening" }]);
+    const result = await organize("Gym this evening");
+    expect(result.tasks).toEqual([{ title: "Gym", timeOfDay: "evening" }]);
+    expect(result.degraded).toBe(false);
+  });
+
+  it("surfaces the degraded flag when the server fell back to the fake parser", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ tasks: [{ title: "Gym" }], degraded: true }), { status: 200 }),
+    );
+    const result = await organize("Gym this evening");
+    expect(result.degraded).toBe(true);
+    expect(result.tasks).toHaveLength(1);
   });
 
   it("throws the server error message on failure", async () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parsedTaskSchema, parsedTasksSchema } from "./schema";
+import { parsedTaskSchema, parsedTasksSchema, modelTaskSchema } from "./schema";
 import { buildSystemPrompt } from "./prompt";
 
 describe("parsedTaskSchema", () => {
@@ -23,6 +23,48 @@ describe("parsedTaskSchema", () => {
 
   it("rejects an unknown priority", () => {
     expect(() => parsedTaskSchema.parse({ title: "x", priority: "critical" })).toThrow();
+  });
+
+  it("accepts null priority/tags (real strict-mode models emit null, not omission)", () => {
+    const parsed = parsedTaskSchema.parse({ title: "x", priority: null, tags: null });
+    expect(parsed.title).toBe("x");
+  });
+});
+
+describe("modelTaskSchema (OpenAI strict-mode output contract)", () => {
+  it("requires every key present — strict mode can't omit keys, only null them", () => {
+    // The lenient contract accepts a title-only task…
+    expect(() => parsedTaskSchema.parse({ title: "x" })).not.toThrow();
+    // …but the model schema must list every field so OpenAI puts them all in `required`.
+    expect(() => modelTaskSchema.parse({ title: "x" })).toThrow();
+  });
+
+  it("accepts every optional field as null", () => {
+    const parsed = modelTaskSchema.parse({
+      title: "Finish deck",
+      notes: null,
+      doDate: null,
+      time: null,
+      timeOfDay: null,
+      deadline: null,
+      priority: null,
+      tags: null,
+    });
+    expect(parsed.title).toBe("Finish deck");
+  });
+
+  it("stays contract-compatible: strict model output validates against the lenient schema", () => {
+    const modelOut = modelTaskSchema.parse({
+      title: "Gym",
+      notes: null,
+      doDate: null,
+      time: null,
+      timeOfDay: "evening",
+      deadline: null,
+      priority: null,
+      tags: null,
+    });
+    expect(() => parsedTaskSchema.parse(modelOut)).not.toThrow();
   });
 });
 

@@ -17,13 +17,15 @@ vi.spyOn(console, "error").mockImplementation(() => {});
 import { POST } from "./route";
 
 describe("POST /api/organize — parser failure", () => {
-  it("returns 502 with a generic message and no internal error detail", async () => {
+  it("returns 502 with an honest, non-blaming message and no internal error detail", async () => {
     const res = await POST(
       new Request("http://test/api/organize", { method: "POST", body: JSON.stringify({ text: "Gym" }) }),
     );
     expect(res.status).toBe(502);
     const json = await res.json();
-    expect(json.error).toBe("Could not structure that. Try rephrasing.");
+    // Genuine internal failure — must not blame the user's phrasing ("Try rephrasing").
+    expect(json.error).toBe("Something went wrong organizing that. Please try again.");
+    expect(json.error).not.toMatch(/rephras/i);
     const body = JSON.stringify(json);
     expect(body).not.toContain("boom");
     expect(body).not.toContain("INTERNAL");

@@ -13,9 +13,11 @@ interface Props {
   proposal: ParsedTask[];
   onCommit(tasks: ParsedTask[]): void;
   onStartOver(): void;
+  /** Real AI was unavailable and the server fell back to the basic parser — say so honestly. */
+  degraded?: boolean;
 }
 
-export function ReviewScreen({ proposal, onCommit, onStartOver }: Props) {
+export function ReviewScreen({ proposal, onCommit, onStartOver, degraded = false }: Props) {
   const today = todayISO();
   // Seeds once per mount; CaptureFlow only renders ReviewScreen while a proposal exists and passes through proposal=null on Start Over, so each review session is a fresh mount.
   const [items, setItems] = useState<ParsedTask[]>(proposal);
@@ -77,6 +79,14 @@ export function ReviewScreen({ proposal, onCommit, onStartOver }: Props) {
       </header>
 
       <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto bg-surface-1 px-3.5 py-3.5">
+        {degraded && (
+          <p
+            role="status"
+            className="rounded-lg border border-border-warning bg-bg-warning px-3 py-2 text-[13px] text-text-warning"
+          >
+            AI was temporarily unavailable — organized with a basic parser. Tap any task to adjust.
+          </p>
+        )}
         {todays.length > 0 && <p className="text-[13px] text-text-secondary">☀ Today · {todays.length}</p>}
         {todays.map(card)}
         {inbox.length > 0 && <p className="mt-1.5 text-[13px] text-text-secondary">📥 Inbox · {inbox.length}</p>}
