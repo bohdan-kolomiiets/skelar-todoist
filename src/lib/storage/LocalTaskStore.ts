@@ -1,7 +1,9 @@
 import type { Task } from "../task/types";
 import type { TaskStore } from "./TaskStore";
 
-const DEFAULT_KEY = "planner.tasks.v1";
+/** Base localStorage key for the task list (namespaced per profile via profileKey). */
+export const TASKS_KEY = "planner.tasks.v1";
+const DEFAULT_KEY = TASKS_KEY;
 
 /** localStorage-backed store. Tolerates missing/corrupt data by returning []. */
 export class LocalTaskStore implements TaskStore {
