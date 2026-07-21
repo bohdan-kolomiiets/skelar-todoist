@@ -58,4 +58,10 @@ describe("TaskEditorSheet", () => {
     await userEvent.click(screen.getByRole("button", { name: /^done$/i }));
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ tags: ["work", "health"] }));
   });
+
+  it("uses a Tabler X for close (P1)", () => {
+    render(<TaskEditorSheet open initial={{ title: "test" }} onClose={vi.fn()} onSave={vi.fn()} />);
+    const close = screen.getByRole("button", { name: /close/i });
+    expect(close.querySelector("svg")).toBeInTheDocument();
+  });
 });
