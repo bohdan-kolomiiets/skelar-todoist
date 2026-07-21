@@ -57,7 +57,7 @@ export class FakeTaskParser implements TaskParser {
     if (/(\burgent\b|\basap\b|\bimportant\b|\bmust\b|!!)/.test(lower)) task.priority = "high";
 
     // deadline: "due <expr>"
-    const due = lower.match(/due\s+([a-z]+)/);
+    const due = lower.match(/\bdue\s+([a-z]+)/);
     if (due) task.deadline = resolveDate(due[1], this.today);
 
     // part of day
@@ -81,11 +81,13 @@ export class FakeTaskParser implements TaskParser {
     } else if (/\btomorrow\b/.test(lower)) {
       task.doDate = addDays(this.today, 1);
     } else {
-      const wd = WEEKDAYS.find((w) => new RegExp(`\\b${w}\\b`).test(lower));
-      // Only route by weekday when it isn't the "due <weekday>" we already consumed.
-      const wdIsDeadline = due && wd && due[1].startsWith(wd.slice(0, 3));
-      if (wd && !wdIsDeadline) task.doDate = nextWeekday(wd, this.today);
-      else task.doDate = this.today; // default do-day = today
+      // Route by a bare weekday, but skip the weekday already consumed by "due X"
+      // (deadline is not the do-date).
+      const wd = WEEKDAYS.find(
+        (w) => new RegExp(`\\b${w}\\b`).test(lower) && !(due && due[1].startsWith(w.slice(0, 3))),
+      );
+      if (wd) task.doDate = nextWeekday(wd, this.today);
+      else task.doDate = this.today;
     }
 
     task.title = this.cleanTitle(clause);
@@ -94,7 +96,7 @@ export class FakeTaskParser implements TaskParser {
 
   private cleanTitle(clause: string): string {
     const t = clause
-      .replace(/,?\s*due\s+[a-z]+/gi, "")
+      .replace(/,?\s*\bdue\s+[a-z]+/gi, "")
       .replace(/\b(today|tomorrow|this)\b/gi, "")
       .replace(/\b(morning|afternoon|evening)\b/gi, "")
       .replace(/\b(someday|one day)\b/gi, "")
