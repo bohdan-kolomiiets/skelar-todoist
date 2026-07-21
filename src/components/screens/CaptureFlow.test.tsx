@@ -167,6 +167,7 @@ describe("CaptureFlow", () => {
 
   it("blocks Plan it with the limit sheet when a non-Pro user is out of inputs", async () => {
     localStorage.clear();
+    vi.mocked(organize).mockClear();
     const service = new LocalAuthService();
     const guest = service.startGuest();
     // Pre-exhaust today's usage for this profile (default limit 3).
@@ -178,5 +179,37 @@ describe("CaptureFlow", () => {
     await userEvent.type(screen.getByLabelText(/brain dump/i), "something");
     await userEvent.click(screen.getByRole("button", { name: /plan it/i }));
     expect(await screen.findByText(/out of ai plans for today/i)).toBeInTheDocument();
+    // Non-blocking, no parse runs: the gate short-circuits before organize() is called.
+    expect(organize).not.toHaveBeenCalled();
+  });
+
+  it("never gates or meters a Pro user, even with exhausted usage", async () => {
+    localStorage.clear();
+    const service = new LocalAuthService();
+    const guest = service.startGuest();
+    service.setTier("pro");
+    // Same shape as the block-when-exhausted case, but for a Pro profile — the
+    // gate (and the "N left" meter line) must not apply to Pro users at all.
+    const today = todayISO();
+    localStorage.setItem(profileKey(USAGE_KEY, guest.id), JSON.stringify({ date: today, count: 3 }));
+    renderCaptureWith(service);
+    expect(screen.queryByText(/plans left today/i)).not.toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText(/brain dump/i), "something");
+    await userEvent.click(screen.getByRole("button", { name: /plan it/i }));
+    expect(await screen.findByRole("button", { name: /add 2 tasks/i })).toBeInTheDocument();
+    expect(screen.queryByText(/out of ai plans for today/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/plans left today/i)).not.toBeInTheDocument();
+  });
+
+  it("increments the daily usage bucket after a successful organize", async () => {
+    localStorage.clear();
+    const service = new LocalAuthService();
+    const guest = service.startGuest();
+    renderCaptureWith(service);
+    await userEvent.type(screen.getByLabelText(/brain dump/i), "Gym this evening. Read design book.");
+    await userEvent.click(screen.getByRole("button", { name: /plan it/i }));
+    await screen.findByRole("button", { name: /add 2 tasks/i });
+    const stored = JSON.parse(localStorage.getItem(profileKey(USAGE_KEY, guest.id))!);
+    expect(stored.count).toBe(1);
   });
 });

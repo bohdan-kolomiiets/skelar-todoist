@@ -14,9 +14,9 @@ interface Props {
 export function LimitReachedSheet({ open, onClose, used, limit }: Props) {
   return (
     <BottomSheet open={open} onClose={onClose} ariaLabel="Daily AI limit reached">
-      <h2 className="text-lg font-medium">You&rsquo;re out of AI plans for today</h2>
+      <h2 className="text-lg font-medium">You&apos;re out of AI plans for today</h2>
       <p className="mt-1 text-text-secondary">
-        You&rsquo;ve used today&apos;s {used} AI {limit === 1 ? "input" : "inputs"}. Upgrade to Pro for unlimited planning.
+        You&apos;ve used today&apos;s {used} AI {limit === 1 ? "input" : "inputs"}. Upgrade to Pro for unlimited planning.
       </p>
       <Link
         href="/plans"
