@@ -21,6 +21,7 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const mode = await resolveAiMode();
+  console.log(`[/api/organize] aiMode=${mode}`);
 
   try {
     const parser: TaskParser = mode === "real" ? new GatewayTaskParser() : new FakeTaskParser();
@@ -28,7 +29,7 @@ export async function POST(request: Request): Promise<Response> {
     const tasks = parsedTasksSchema.parse(parsed); // enforce the contract before it reaches the client
     return NextResponse.json({ tasks });
   } catch (err) {
-    console.error("[/api/organize] parse failed:", err);
+    console.error(`[/api/organize] parse failed (aiMode=${mode}):`, err);
     return NextResponse.json({ error: "Could not structure that. Try rephrasing." }, { status: 502 });
   }
 }
