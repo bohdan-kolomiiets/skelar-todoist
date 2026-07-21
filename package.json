@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.16",
+    "@tabler/icons-react": "^3.45.0",
     "@vercel/edge-config": "^1.4.3",
     "ai": "^7.0.32",
     "next": "16.2.10",

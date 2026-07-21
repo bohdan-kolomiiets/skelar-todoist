@@ -29,4 +29,15 @@ describe("TabBar", () => {
     expect(screen.getByRole("link", { name: /capture/i })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: /today/i })).not.toHaveAttribute("aria-current");
   });
+
+  it("renders a decorative icon in each tab (mockup fidelity, issue #4 #6)", () => {
+    render(<TabBar />);
+    for (const label of ["capture", "today", "inbox"]) {
+      const link = screen.getByRole("link", { name: new RegExp(label, "i") });
+      const icon = link.querySelector("svg");
+      expect(icon).toBeInTheDocument();
+      // Decorative — the text label is the accessible name.
+      expect(icon).toHaveAttribute("aria-hidden", "true");
+    }
+  });
 });

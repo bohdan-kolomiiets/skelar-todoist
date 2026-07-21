@@ -33,6 +33,41 @@ describe("CaptureFlow", () => {
     expect(screen.getByRole("button", { name: /try an example/i })).toBeInTheDocument();
   });
 
+  it("shows a wand icon on the example chip, not an emoji (issue #4 #7)", () => {
+    renderFlow();
+    const chip = screen.getByRole("button", { name: /try an example/i });
+    const icon = chip.querySelector("svg");
+    expect(icon).toBeInTheDocument();
+    expect(icon).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("shows a help-circle icon on the Tips button (issue #4 #8)", () => {
+    renderFlow();
+    const tips = screen.getByRole("button", { name: /tips/i });
+    const icon = tips.querySelector("svg");
+    expect(icon).toBeInTheDocument();
+    expect(icon).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("opens the Tips guide when the Tips button is tapped (issue #4 #8)", async () => {
+    renderFlow();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /tips/i }));
+    expect(await screen.findByRole("dialog", { name: /how i read your dump/i })).toBeInTheDocument();
+  });
+
+  it("opens the voice coming-soon sheet when the mic is tapped (issue #4 #9)", async () => {
+    renderFlow();
+    await userEvent.click(screen.getByRole("button", { name: /voice input/i }));
+    expect(await screen.findByRole("dialog", { name: /voice capture/i })).toBeInTheDocument();
+  });
+
+  it("shows an arrow icon on Plan it, not a text arrow (issue #4 #9)", () => {
+    renderFlow();
+    const planIt = screen.getByRole("button", { name: /plan it/i });
+    expect(planIt.querySelector("svg")).toBeInTheDocument();
+  });
+
   it("parses a dump and transitions to Review", async () => {
     renderFlow();
     await userEvent.type(screen.getByPlaceholderText(/what's on your mind/i), "Gym this evening. Read design book.");
