@@ -118,4 +118,12 @@ describe("ReviewScreen", () => {
     await userEvent.click(screen.getByRole("button", { name: /move to inbox/i }));
     expect(screen.queryByLabelText(/title/i)).not.toBeInTheDocument();
   });
+
+  it("uses Tabler icons for remove and the placement pill (P1)", () => {
+    render(<ReviewScreen proposal={proposal} onCommit={vi.fn()} onStartOver={vi.fn()} />);
+    const remove = screen.getAllByRole("button", { name: /remove/i })[0];
+    expect(remove.querySelector("svg")).toBeInTheDocument();
+    const pill = screen.getAllByRole("button", { name: /move to (inbox|today)/i })[0];
+    expect(pill.querySelector("svg")).toBeInTheDocument();
+  });
 });
