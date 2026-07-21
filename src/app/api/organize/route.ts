@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { resolveAiMode } from "@/lib/ai/mode";
+import { resolveAiMode, resolveAiModel } from "@/lib/ai/mode";
 import { parsedTasksSchema } from "@/lib/ai/schema";
 import { FakeTaskParser } from "@/lib/ai/fakeParser";
 import { GatewayTaskParser } from "@/lib/ai/gatewayParser";
@@ -27,8 +27,10 @@ export async function POST(request: Request): Promise<Response> {
     let parsed: ParsedTask[];
     let degraded = false;
     if (mode === "real") {
+      const model = await resolveAiModel();
+      console.log(`[/api/organize] aiModel=${model}`);
       try {
-        parsed = await new GatewayTaskParser().parse(text);
+        parsed = await new GatewayTaskParser({ model, byokKey: process.env.AI_API_KEY }).parse(text);
       } catch (err) {
         // Real AI unavailable (gateway/model/billing/timeout). Stay demo-safe:
         // fall back to the deterministic parser so the user still gets a plan,

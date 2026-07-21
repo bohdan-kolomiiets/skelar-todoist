@@ -2,7 +2,10 @@ import { describe, it, expect, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 // Real mode: exercise the live-parser path so the fallback can trigger.
-vi.mock("@/lib/ai/mode", () => ({ resolveAiMode: () => Promise.resolve("real") }));
+vi.mock("@/lib/ai/mode", () => ({
+  resolveAiMode: () => Promise.resolve("real"),
+  resolveAiModel: () => Promise.resolve("openai/gpt-4o-mini"),
+}));
 // The Gateway parser is unavailable (e.g. free-tier RestrictedModelsError, timeout).
 vi.mock("@/lib/ai/gatewayParser", () => ({
   GatewayTaskParser: class {
