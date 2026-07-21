@@ -41,6 +41,21 @@ describe("CaptureFlow", () => {
     expect(icon).toHaveAttribute("aria-hidden", "true");
   });
 
+  it("shows a help-circle icon on the Tips button (issue #4 #8)", () => {
+    renderFlow();
+    const tips = screen.getByRole("button", { name: /tips/i });
+    const icon = tips.querySelector("svg");
+    expect(icon).toBeInTheDocument();
+    expect(icon).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("opens the Tips guide when the Tips button is tapped (issue #4 #8)", async () => {
+    renderFlow();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /tips/i }));
+    expect(await screen.findByRole("dialog", { name: /how i read your dump/i })).toBeInTheDocument();
+  });
+
   it("parses a dump and transitions to Review", async () => {
     renderFlow();
     await userEvent.type(screen.getByPlaceholderText(/what's on your mind/i), "Gym this evening. Read design book.");

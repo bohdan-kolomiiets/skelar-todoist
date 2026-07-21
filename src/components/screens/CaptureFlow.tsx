@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { IconWand } from "@tabler/icons-react";
+import { IconWand, IconHelpCircle } from "@tabler/icons-react";
+import { TipsSheet } from "@/components/capture/TipsSheet";
 import { organize } from "@/lib/ai/organizeClient";
 import { useTasks } from "@/lib/tasks/useTasks";
 import type { ParsedTask } from "@/lib/task/types";
@@ -21,6 +22,7 @@ export function CaptureFlow() {
   const [degraded, setDegraded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tipsOpen, setTipsOpen] = useState(false);
 
   async function planIt() {
     setBusy(true);
@@ -77,7 +79,10 @@ export function CaptureFlow() {
           className="mt-1 min-h-44 flex-1 resize-none bg-transparent text-base leading-relaxed outline-none placeholder:text-text-muted"
         />
         <div className="mt-1 flex items-center justify-between border-t border-border pt-2">
-          <button type="button" className="min-h-11 text-[13px] text-text-secondary">Tips</button>
+          <button type="button" onClick={() => setTipsOpen(true)} className="inline-flex min-h-11 items-center gap-1.5 text-[13px] text-text-secondary">
+            <IconHelpCircle size={15} aria-hidden />
+            Tips
+          </button>
           <div className="flex items-center gap-3">
             <button type="button" disabled aria-label="Voice input, coming soon" className="text-text-disabled">🎙️</button>
             <button
@@ -95,6 +100,7 @@ export function CaptureFlow() {
       <p className="text-[13px] text-text-secondary">
         Tip: say <em>when</em> — “today”, “tomorrow 3pm”, “gym this evening”, “report due Fri”.
       </p>
+      <TipsSheet open={tipsOpen} onClose={() => setTipsOpen(false)} />
     </section>
   );
 }
