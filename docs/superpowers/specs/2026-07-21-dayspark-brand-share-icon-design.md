@@ -44,10 +44,12 @@ mark reads on both), renaming the Vercel project/repo.
 
 ## 4. Architecture / approach
 
-**One source of truth for the mark.** A small brand module — `src/components/brand/` —
-exports React SVG components: `Mark` (the spark), `Badge` (spark-in-tile), and `Wordmark`
-(Badge/Mark + "Dayspark"). The in-app header consumes these directly. The same JSX/SVG feeds
-`next/og` so the icons and share image can never drift from the in-app logo.
+**One source of truth for the mark.** The design-source SVGs are saved in
+[`docs/brand/`](../../brand/) (`dayspark-mark`, `-badge`, `-wordmark`, `-og`). A small brand
+module — `src/components/brand/` — mirrors them as React SVG components: `Mark` (the spark),
+`Badge` (spark-in-tile), and `Wordmark` (Badge/Mark + "Dayspark"). The in-app header consumes
+these directly, and the same JSX/SVG feeds `next/og` — so the icons and share image can never
+drift from the in-app logo.
 
 **Image generation via `next/og` + Next file conventions.** No hand-exported PNGs to
 maintain:
