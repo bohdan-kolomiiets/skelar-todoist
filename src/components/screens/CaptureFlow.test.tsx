@@ -25,6 +25,7 @@ import { SaveNudgeProvider } from "@/lib/nudge/SaveNudgeProvider";
 import { profileKey } from "@/lib/profile/profileKey";
 import { USAGE_KEY } from "@/lib/usage/LocalUsageService";
 import { todayISO } from "@/lib/date/clock";
+import { LocalWaitlistService } from "@/lib/waitlist/LocalWaitlistService";
 
 function renderCaptureWith(service: LocalAuthService) {
   return render(
@@ -84,6 +85,12 @@ describe("CaptureFlow", () => {
     renderCapture();
     await userEvent.click(screen.getByRole("button", { name: /voice input/i }));
     expect(await screen.findByRole("dialog", { name: /voice capture/i })).toBeInTheDocument();
+  });
+
+  it("logs waitlist interest every time the mic is tapped", async () => {
+    renderCapture();
+    await userEvent.click(screen.getByRole("button", { name: /voice input, coming soon/i }));
+    expect(new LocalWaitlistService().interestCount("voice")).toBe(1);
   });
 
   it("shows a spark on Plan it to signal the AI moment (P1)", () => {

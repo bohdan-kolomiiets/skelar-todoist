@@ -14,6 +14,7 @@ import { useAuth } from "@/lib/auth/useAuth";
 import { useSaveNudge } from "@/lib/nudge/useSaveNudge";
 import { usePersistentState } from "@/lib/preferences/usePersistentState";
 import { LocalUsageService, USAGE_KEY } from "@/lib/usage/LocalUsageService";
+import { LocalWaitlistService } from "@/lib/waitlist/LocalWaitlistService";
 import { profileKey } from "@/lib/profile/profileKey";
 import { todayISO } from "@/lib/date/clock";
 import type { ParsedTask } from "@/lib/task/types";
@@ -45,6 +46,8 @@ export function CaptureFlow() {
   const [tipsOpen, setTipsOpen] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
   const firstRun = profile?.hasOrganizedOnce !== true;
+
+  const waitlist = useMemo(() => new LocalWaitlistService(), []);
 
   const today = todayISO();
   const usage = useMemo(
@@ -160,7 +163,10 @@ export function CaptureFlow() {
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => setVoiceOpen(true)}
+              onClick={() => {
+                waitlist.recordInterest("voice");
+                setVoiceOpen(true);
+              }}
               aria-label="Voice input, coming soon"
               className="flex min-h-11 min-w-11 items-center justify-center text-text-disabled"
             >
@@ -189,7 +195,10 @@ export function CaptureFlow() {
         </p>
       )}
       <TipsSheet open={tipsOpen} onClose={() => setTipsOpen(false)} />
-      <VoiceComingSoonSheet open={voiceOpen} onClose={() => setVoiceOpen(false)} />
+      {/* Mounted only while open (not always-mounted like TipsSheet/LimitReachedSheet) so
+          each open is a fresh mount — the sheet's joined-state initializer genuinely
+          re-reads storage every time, instead of running once at CaptureFlow mount. */}
+      {voiceOpen && <VoiceComingSoonSheet open onClose={() => setVoiceOpen(false)} />}
       <LimitReachedSheet open={limitOpen} onClose={() => setLimitOpen(false)} used={used} limit={limit} />
     </section>
   );

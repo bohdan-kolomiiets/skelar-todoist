@@ -31,9 +31,14 @@ per-profile localStorage buckets via `profileKey`, **copy-on-sign-in**, legacy a
 sign-in), `/api/organize` echoes the limit, **`BillingService`** entitlements → `isPro`/`upgrade`/
 `downgrade` on `useAuth`, Capture **free→pro gate** (non-blocking pre-check) + `LimitReachedSheet`
 + "N left today" meter, `(account)` route group with **Plans** (fake upgrade/downgrade) + **Settings**
-+ a gear entry in every primary header. Verified: unit **224**, e2e **8/8**, lint+typecheck clean;
-final opus review Ready-to-merge (0 Critical/Important). **Next: access-ladder M3** (voice waitlist)
-or Dayspark Phase 2.
++ a gear entry in every primary header. **M2 shipped (PR #16, merged).**
+**Access ladder — M3 in review:** voice waitlist (completes the funnel). Device-global swappable
+**`WaitlistService`** (`join`/`hasJoined`/`recordInterest`); the mic teaser is now a real fake-door —
+tap logs interest, **"Notify me"** joins the waitlist (signed-in = one tap, guest = email field),
+and the mic is stateful (**"You're on the list"** persists on reopen). Waitlist ≠ registration; no
+email actually sent. Verified: unit **230**, lint+typecheck clean, e2e→CI; final opus review
+Ready-to-merge (0 Critical/Important). **The guest→free→pro + voice-fake-door access ladder is now
+complete.** **Next: Milestone C** or Dayspark Phase 2.
 
 ## Done
 - [x] Git repo on `main`; GitHub remote (`github.com:bohdan-kolomiiets/skelar-todoist`)
@@ -137,16 +142,16 @@ or Dayspark Phase 2.
    (`hasOrganizedOnce`), exact empty-state copy, quick-add AI entry points, plus the deferred
    robustness items (client-tz `today` into `/api/organize`, empty-parse-result UX,
    deadline-badge tone) tracked in `.superpowers/sdd/progress.md`.
-3. **Access ladder (Plan 2) — M1 SHIPPED (PR #15, merged), M2 IN REVIEW; M3 next.** Spec:
-   [docs/superpowers/specs/2026-07-21-access-ladder-design.md](./superpowers/specs/2026-07-21-access-ladder-design.md).
-   M1 plan: [.../2026-07-21-access-ladder.md](./superpowers/plans/2026-07-21-access-ladder.md);
-   M2 plan: [.../2026-07-22-access-ladder-m2.md](./superpowers/plans/2026-07-22-access-ladder-m2.md).
-   **M2** (built, in PR): `UsageService` daily metering + limit gate + `/api/organize` returns
-   `freeDailyInputs` + `BillingService`/entitlements + **Plans** + **Settings** + fake upgrade.
-   **M3** (next, own plan when reached) = `WaitlistService` behind the voice mic teaser. **Deferred
-   follow-ups** (from M1/M2 reviews, in `.superpowers/sdd/progress.md`): extract a `useIsHydrated()`
-   hook (the hydration trio is now in 4 files — do first in M3); PlansScreen pre-guest test +
-   Downgrade-button padding; client-tz `today` into `/api/organize`.
+3. **Access ladder (Plan 2) — COMPLETE.** M1 (PR #15) + M2 (PR #16) merged; M3 (voice waitlist) built
+   & in PR. Spec:
+   [docs/superpowers/specs/2026-07-21-access-ladder-design.md](./superpowers/specs/2026-07-21-access-ladder-design.md);
+   plans: [M1](./superpowers/plans/2026-07-21-access-ladder.md),
+   [M2](./superpowers/plans/2026-07-22-access-ladder-m2.md),
+   [M3](./superpowers/plans/2026-07-22-access-ladder-m3.md). The full guest→free→pro funnel + voice
+   fake-door is done. **Deferred follow-ups** (from reviews, in `.superpowers/sdd/progress.md`):
+   extract a `useIsHydrated()` hook (the hydration trio is now in **4+ files** — highest-value
+   cleanup); PlansScreen pre-guest test + Downgrade-button padding; client-tz `today` into
+   `/api/organize`; optional `@`-guard on the waitlist email field.
 
 ## Parked (revisit after Dayspark UI + Milestone C)
 - **AI doesn't infer relative-offset dates.** Manual test "I need to not forget to grab a
