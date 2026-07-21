@@ -3,15 +3,19 @@
 import { createContext, useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import type { AuthService, Profile, Tier } from "./types";
 import { LocalAuthService } from "./LocalAuthService";
+import { LocalBillingService } from "../billing/LocalBillingService";
 
 export interface AuthContextValue {
   profile: Profile | null;
+  isPro: boolean;
   startGuest(): void;
   signIn(input: { emailOrName: string }): void;
   signOut(): void;
   markOrganized(): void;
   markSaved(): void;
   setTier(tier: Tier): void;
+  upgrade(): void;
+  downgrade(): void;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
@@ -22,6 +26,7 @@ const getIsHydratedOnServer = () => false;
 
 export function AuthProvider({ service, children }: { service?: AuthService; children: React.ReactNode }) {
   const [active] = useState<AuthService>(() => service ?? new LocalAuthService());
+  const [billing] = useState(() => new LocalBillingService(active));
   const isHydrated = useSyncExternalStore(neverSubscribe, getIsHydratedOnClient, getIsHydratedOnServer);
 
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -42,10 +47,13 @@ export function AuthProvider({ service, children }: { service?: AuthService; chi
   const markOrganized = useCallback(() => { active.markOrganized(); refresh(); }, [active, refresh]);
   const markSaved = useCallback(() => { active.markSaved(); refresh(); }, [active, refresh]);
   const setTier = useCallback((tier: Tier) => { active.setTier(tier); refresh(); }, [active, refresh]);
+  const upgrade = useCallback(() => { billing.upgrade(); refresh(); }, [billing, refresh]);
+  const downgrade = useCallback(() => { billing.downgrade(); refresh(); }, [billing, refresh]);
+  const isPro = profile?.tier === "pro";
 
   const value = useMemo<AuthContextValue>(
-    () => ({ profile, startGuest, signIn, signOut, markOrganized, markSaved, setTier }),
-    [profile, startGuest, signIn, signOut, markOrganized, markSaved, setTier],
+    () => ({ profile, isPro, startGuest, signIn, signOut, markOrganized, markSaved, setTier, upgrade, downgrade }),
+    [profile, isPro, startGuest, signIn, signOut, markOrganized, markSaved, setTier, upgrade, downgrade],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -32,4 +32,15 @@ describe("useAuth", () => {
     act(() => result.current.markOrganized());
     expect(result.current.profile?.hasOrganizedOnce).toBe(true);
   });
+
+  it("upgrade flips isPro reactively; downgrade reverts it", () => {
+    localStorage.clear();
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    act(() => result.current.startGuest());
+    expect(result.current.isPro).toBe(false);
+    act(() => result.current.upgrade());
+    expect(result.current.isPro).toBe(true);
+    act(() => result.current.downgrade());
+    expect(result.current.isPro).toBe(false);
+  });
 });
