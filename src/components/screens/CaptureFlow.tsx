@@ -7,6 +7,7 @@ import { DaysparkWordmark } from "@/components/brand/DaysparkWordmark";
 import { TipsSheet } from "@/components/capture/TipsSheet";
 import { VoiceComingSoonSheet } from "@/components/capture/VoiceComingSoonSheet";
 import { LimitReachedSheet } from "@/components/billing/LimitReachedSheet";
+import { SettingsGear } from "@/components/nav/SettingsGear";
 import { organize } from "@/lib/ai/organizeClient";
 import { useTasks } from "@/lib/tasks/useTasks";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -92,8 +93,9 @@ export function CaptureFlow() {
 
   return (
     <section className="flex flex-1 flex-col gap-2.5 px-4 py-4">
-      <header className="flex items-center pb-1">
+      <header className="flex items-center justify-between pb-1">
         <DaysparkWordmark />
+        <SettingsGear />
       </header>
       <div className="flex flex-1 flex-col rounded-xl border border-border bg-surface-1 p-3">
         {/* Chip in a normal-flow row (issue #4 #7) so it can never overlap the typed

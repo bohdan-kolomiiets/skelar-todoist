@@ -11,6 +11,7 @@ import { formatFullDate } from "@/lib/date/format";
 import type { Task, TaskDraft } from "@/lib/task/types";
 import { TaskRow } from "@/components/task/TaskRow";
 import { TaskEditorSheet } from "@/components/task/TaskEditorSheet";
+import { SettingsGear } from "@/components/nav/SettingsGear";
 
 const SECTIONS: Array<["overdue" | "morning" | "afternoon" | "evening" | "anytime", string]> = [
   ["overdue", "Overdue"],
@@ -40,11 +41,14 @@ export function TodayScreen() {
 
   return (
     <section className="flex flex-1 flex-col px-4 pb-3">
-      <header className="pb-2 pt-4">
-        <h1 className="text-xl font-medium">Today</h1>
-        <p className="mt-0.5 text-[13px] text-text-secondary">
-          {formatFullDate(today)} · {completed.length} of {todays.length} done
-        </p>
+      <header className="flex items-start justify-between pb-2 pt-4">
+        <div>
+          <h1 className="text-xl font-medium">Today</h1>
+          <p className="mt-0.5 text-[13px] text-text-secondary">
+            {formatFullDate(today)} · {completed.length} of {todays.length} done
+          </p>
+        </div>
+        <SettingsGear />
       </header>
 
       {todays.length === 0 ? (

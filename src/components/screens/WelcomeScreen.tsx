@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { LocalAuthService } from "@/lib/auth/LocalAuthService";
 import { DaysparkWordmark } from "@/components/brand/DaysparkWordmark";
 import { SignInForm } from "@/components/auth/SignInForm";
@@ -48,6 +49,10 @@ export function WelcomeScreen() {
           </button>
         </div>
       )}
+
+      <Link href="/plans" className="text-center text-[13px] text-text-secondary underline">
+        What&rsquo;s included
+      </Link>
     </section>
   );
 }
