@@ -8,6 +8,7 @@ import { TipsSheet } from "@/components/capture/TipsSheet";
 import { VoiceComingSoonSheet } from "@/components/capture/VoiceComingSoonSheet";
 import { organize } from "@/lib/ai/organizeClient";
 import { useTasks } from "@/lib/tasks/useTasks";
+import { useAuth } from "@/lib/auth/useAuth";
 import type { ParsedTask } from "@/lib/task/types";
 import { ReviewScreen } from "./ReviewScreen";
 
@@ -19,6 +20,7 @@ const PLACEHOLDER =
 export function CaptureFlow() {
   const router = useRouter();
   const { addTasks } = useTasks();
+  const { profile, markOrganized } = useAuth();
   const [text, setText] = useState("");
   const [proposal, setProposal] = useState<ParsedTask[] | null>(null);
   const [degraded, setDegraded] = useState(false);
@@ -26,12 +28,14 @@ export function CaptureFlow() {
   const [error, setError] = useState<string | null>(null);
   const [tipsOpen, setTipsOpen] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
+  const firstRun = profile?.hasOrganizedOnce !== true;
 
   async function planIt() {
     setBusy(true);
     setError(null);
     try {
       const { tasks, degraded } = await organize(text);
+      if (tasks.length > 0) markOrganized();
       setDegraded(degraded);
       setProposal(tasks);
     } catch (e) {
@@ -67,16 +71,18 @@ export function CaptureFlow() {
       <div className="flex flex-1 flex-col rounded-xl border border-border bg-surface-1 p-3">
         {/* Chip in a normal-flow row (issue #4 #7) so it can never overlap the typed
             text — the old absolute+min-h-11 chip did. Wand icon per the mockup. */}
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={() => setText(EXAMPLE_DUMP)}
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-border-strong bg-surface-2 px-2.5 py-1 text-xs"
-          >
-            <IconWand size={15} className="text-text-accent" aria-hidden />
-            Try an example
-          </button>
-        </div>
+        {firstRun && (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setText(EXAMPLE_DUMP)}
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-border-strong bg-surface-2 px-2.5 py-1 text-xs"
+            >
+              <IconWand size={15} className="text-text-accent" aria-hidden />
+              Try an example
+            </button>
+          </div>
+        )}
         <textarea
           aria-label="Brain dump"
           value={text}
@@ -110,9 +116,11 @@ export function CaptureFlow() {
         </div>
       </div>
       {error && <p className="text-[13px] text-text-danger">{error}</p>}
-      <p className="text-[13px] text-text-secondary">
-        Tip: say <em>when</em> — “today”, “tomorrow 3pm”, “gym this evening”, “report due Fri”.
-      </p>
+      {firstRun && (
+        <p className="text-[13px] text-text-secondary">
+          Tip: say <em>when</em> — "today", "tomorrow 3pm", "gym this evening", "report due Fri".
+        </p>
+      )}
       <TipsSheet open={tipsOpen} onClose={() => setTipsOpen(false)} />
       <VoiceComingSoonSheet open={voiceOpen} onClose={() => setVoiceOpen(false)} />
     </section>
