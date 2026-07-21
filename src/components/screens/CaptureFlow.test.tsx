@@ -188,6 +188,30 @@ describe("CaptureFlow", () => {
     expect(organize).not.toHaveBeenCalled();
   });
 
+  it("reads the persisted limit on a fresh mount instead of the hardcoded default (regression)", async () => {
+    // Regression coverage for a bug the M2 Task 8 e2e surfaced: `limit` used to be a
+    // plain useState(3), so every fresh mount (reload/back-nav) forgot a configured
+    // limit != 3 and under-counted the gate, letting one extra organize() call
+    // through. It's now backed by usePersistentState("freeDailyInputs", 3), which
+    // persists to the "planner.pref." + key seam (see preferenceStore.ts) — seed
+    // that key directly here, the same way CaptureFlow reads it via usePersistentState.
+    localStorage.clear();
+    vi.mocked(organize).mockClear();
+    const service = new LocalAuthService();
+    const guest = service.startGuest();
+    const today = todayISO();
+    localStorage.setItem("planner.pref.freeDailyInputs", JSON.stringify(1)); // persisted limit: 1, not the hardcoded 3
+    localStorage.setItem(profileKey(USAGE_KEY, guest.id), JSON.stringify({ date: today, count: 1 })); // budget already spent
+    renderCaptureWith(service);
+    await userEvent.type(screen.getByLabelText(/brain dump/i), "something");
+    await userEvent.click(screen.getByRole("button", { name: /plan it/i }));
+    // With the persisted limit of 1 and usage of 1, remaining is 0 → blocked. If
+    // `limit` had reset to the hardcoded default of 3 (the bug), remaining would be
+    // 3 - 1 = 2 and this would sail through to Review instead of blocking here.
+    expect(await screen.findByText(/out of ai plans for today/i)).toBeInTheDocument();
+    expect(organize).not.toHaveBeenCalled();
+  });
+
   it("never gates or meters a Pro user, even with exhausted usage", async () => {
     localStorage.clear();
     const service = new LocalAuthService();

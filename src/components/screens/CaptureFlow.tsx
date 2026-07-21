@@ -67,6 +67,10 @@ export function CaptureFlow() {
   // desync SSR (no localStorage → 0) from a returning user's real client-side count
   // if read directly during render, so it's adopted once, right after hydration
   // commits, via the same during-render pattern as TaskStoreProvider/AuthProvider.
+  // Adopted only that once and then re-synced solely inside planIt() — correct only
+  // because sign-in (SaveNudgeSheet, on Today/Inbox) and upgrade (/plans) both
+  // remount Capture on return; an in-place sign-in/upgrade without leaving Capture
+  // would need `used` re-synced too.
   const isHydrated = useSyncExternalStore(neverSubscribe, getIsHydratedOnClient, getIsHydratedOnServer);
   const [used, setUsed] = useState(0);
   const [usedHydrated, setUsedHydrated] = useState(false);
