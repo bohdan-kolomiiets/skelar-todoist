@@ -17,6 +17,8 @@ export function buildSystemPrompt({ today, knownTags = [] }: { today: string; kn
     "- deadline: 'YYYY-MM-DD' hard due date ('due Friday'). This NEVER decides doDate.",
     "- priority: 'high' ONLY on explicit signals (urgent, important, ASAP, must, !!). Otherwise 'none'.",
     "- tags: freeform topical labels (work, errand, health). Reuse the user's known tags when relevant.",
+    "- needsDate: true ONLY when the input expresses timing you can't resolve to a concrete date",
+    "  ('soon', 'later', 'at some point', 'sometime'). Then leave doDate null. Explicit 'someday' is NOT needsDate.",
     "",
     "Never guess an ambiguous date/time — leave the field null and keep the raw wording in the title.",
     knownTags.length ? `Known tags to reuse when relevant: ${knownTags.join(", ")}.` : "",

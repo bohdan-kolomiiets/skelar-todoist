@@ -80,7 +80,11 @@ export class FakeTaskParser implements TaskParser {
     const inWeeks = lower.match(/\bin\s+(\d+)\s+weeks?\b/);
     const nextWeek = /\bnext week\b|\bin a week\b/.test(lower);
 
-    // routing: someday → null; explicit other/future date → that date; else today
+    // vague unresolved timing: "later", "soon", "sometime", "at some point" —
+    // distinct from the explicit "someday"/"one day" backlog branch below.
+    const vague = /\b(later|soon|sometime|at some point|some day soon)\b/.test(lower);
+
+    // routing: someday → null; explicit other/future date → that date; vague → null + needsDate; else today
     if (/\bsomeday\b|\bone day\b/.test(lower)) {
       task.doDate = null;
     } else if (/\btomorrow\b/.test(lower)) {
@@ -98,7 +102,10 @@ export class FakeTaskParser implements TaskParser {
         (w) => new RegExp(`\\b${w}\\b`).test(lower) && !(due && due[1].startsWith(w.slice(0, 3))),
       );
       if (wd) task.doDate = nextWeekday(wd, this.today);
-      else task.doDate = this.today;
+      else if (vague) {
+        task.doDate = null;
+        task.needsDate = true;
+      } else task.doDate = this.today;
     }
 
     task.title = this.cleanTitle(clause);
@@ -113,6 +120,7 @@ export class FakeTaskParser implements TaskParser {
       .replace(/\b(next week|in a week)\b/gi, "")
       .replace(/\b(morning|afternoon|evening)\b/gi, "")
       .replace(/\b(someday|one day)\b/gi, "")
+      .replace(/\b(later|soon|sometime|at some point|some day soon)\b/gi, "")
       .replace(/\b(urgent|asap|important|must)\b/gi, "")
       .replace(/\b\d{1,2}(?::\d{2})?\s*(am|pm)\b/gi, "")
       .replace(/[—–-]\s*$/g, "")

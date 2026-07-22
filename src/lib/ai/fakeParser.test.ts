@@ -49,4 +49,16 @@ describe("FakeTaskParser (golden dataset)", () => {
     const [t] = await parser.parse("renew pass in 2 weeks");
     expect(t.doDate).toBe("2026-08-03");
   });
+
+  it("flags vague unresolved timing as needsDate with null doDate", async () => {
+    const [t] = await new FakeTaskParser({ today: "2026-07-20" }).parse("call the vet at some point");
+    expect(t.doDate).toBeNull();
+    expect(t.needsDate).toBe(true);
+  });
+
+  it("does NOT flag explicit someday as needsDate", async () => {
+    const [t] = await new FakeTaskParser({ today: "2026-07-20" }).parse("someday read that design book");
+    expect(t.doDate).toBeNull();
+    expect(t.needsDate).toBeFalsy();
+  });
 });

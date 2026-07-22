@@ -65,4 +65,13 @@ export const parseCases: { name: string; input: string; invariants(tasks: Parsed
       assert.equal(tasks[0].doDate, "2026-07-25", "'in 5 days' → today (2026-07-20) + 5");
     },
   },
+  {
+    name: "vague-timing-needs-date",
+    input: "Call the vet at some point",
+    invariants(tasks) {
+      assert.equal(tasks.length, 1);
+      assert.equal(tasks[0].doDate ?? null, null, "vague timing → undated");
+      assert.equal(tasks[0].needsDate, true, "vague timing → needsDate flagged");
+    },
+  },
 ];

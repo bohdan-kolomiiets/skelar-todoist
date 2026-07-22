@@ -16,6 +16,7 @@ export const parsedTaskSchema = z.object({
   deadline: z.string().nullish(), // "YYYY-MM-DD"
   priority: z.enum(["high", "medium", "low", "none"]).nullish(),
   tags: z.array(z.string()).nullish(),
+  needsDate: z.boolean().nullish(),
 });
 
 export const parsedTasksSchema = z.array(parsedTaskSchema);
@@ -37,13 +38,13 @@ export const modelTaskSchema = z.object({
   deadline: z.string().nullable(), // "YYYY-MM-DD"
   priority: z.enum(["high", "medium", "low", "none"]).nullable(),
   tags: z.array(z.string()).nullable(),
+  needsDate: z.boolean().nullable(),
 });
 
 /**
  * Compile-time guard: fails typecheck if `modelTaskSchema` drops or renames a
  * field the `ParsedTask` contract requires (missing-key drift — the direction
- * that breaks downstream consumers). `needsDate` is excluded — it's added to
- * the model schema in a later task (C-T9).
+ * that breaks downstream consumers).
  *
  * This does NOT flag *extra* model keys: `AssertExtends<T extends U, U>` is a
  * width-subtyping assignability check (same direction as `satisfies`), and
@@ -58,7 +59,4 @@ export const modelTaskSchema = z.object({
  */
 type AssertExtends<T extends U, U> = T;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- type-only compile-time guard; never referenced at runtime
-type _ModelSchemaMatchesParsedTask = AssertExtends<
-  z.infer<typeof modelTaskSchema>,
-  Record<keyof Omit<ParsedTask, "needsDate">, unknown>
->;
+type _ModelSchemaMatchesParsedTask = AssertExtends<z.infer<typeof modelTaskSchema>, Record<keyof ParsedTask, unknown>>;
