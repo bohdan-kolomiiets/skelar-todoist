@@ -51,7 +51,7 @@ detection: "later"/"soon"/"at some point") surfaced as an Inbox **"Needs a date"
 **`QuickAddSheet`** (input → optional AI parse → single-task editor or multi-task Review) wired to
 "+ Add task" on both Today and Inbox, and a **link to the Inbox** from Today's empty state when
 undated tasks are waiting there. Sweep
-green: unit **261**, e2e verified (2 new Milestone-C flows: quick-add-via-AI, needs-a-date; full
+green: unit **263**, e2e verified (2 new Milestone-C flows: quick-add-via-AI, needs-a-date; full
 suite CI-deferred per the local `.next`-lock workaround), lint+typecheck clean.
 **Next: Milestone C follow-ups (none blocking)** or Dayspark Phase 2.
 
@@ -164,7 +164,7 @@ suite CI-deferred per the local `.next`-lock workaround), lint+typecheck clean.
   (free-text → optional "Parse with AI" → single-task editor **or** multi-task Review, same
   empty/limit handling as Capture) wired to "+ Add task" on both Today and Inbox; Today's empty
   state adds **a link to the Inbox** so an undated task can be found and scheduled from there.
-  Verified: unit **261**
+  Verified: unit **263**
   (from 230 pre-Milestone-C), e2e — 2 new flows in `e2e/milestone-c.spec.ts` (quick-add-via-AI from
   Today, an unresolved-timing dump landing in Needs-a-date) verified against a running dev server
   via `BASE_URL`; full `npm run test:e2e` deferred to CI (local run blocked by a concurrent dev
