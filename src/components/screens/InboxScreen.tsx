@@ -12,6 +12,7 @@ import type { Task, TaskDraft } from "@/lib/task/types";
 import { TaskRow } from "@/components/task/TaskRow";
 import { Chip } from "@/components/task/Chip";
 import { TaskEditorSheet } from "@/components/task/TaskEditorSheet";
+import { QuickAddSheet } from "@/components/task/QuickAddSheet";
 import { SettingsGear } from "@/components/nav/SettingsGear";
 
 export function InboxScreen() {
@@ -19,6 +20,7 @@ export function InboxScreen() {
   const { notifySaved } = useSaveNudge();
   const today = todayISO();
   const [editing, setEditing] = useState<Task | "new" | null>(null);
+  const [quickAdd, setQuickAdd] = useState(false);
   // Persisted per-screen (issue #4 #5) so "Show" survives refresh / tab switch.
   const [showCompleted, setShowCompleted] = usePersistentState("inbox.showCompleted", false);
 
@@ -77,7 +79,7 @@ export function InboxScreen() {
         </>
       )}
 
-      <button type="button" onClick={() => setEditing("new")} className="mt-2 flex min-h-11 w-full items-center gap-2.5 py-3 text-left text-sm text-text-secondary">
+      <button type="button" onClick={() => setQuickAdd(true)} className="mt-2 flex min-h-11 w-full items-center gap-2.5 py-3 text-left text-sm text-text-secondary">
         + Add task
       </button>
 
@@ -107,6 +109,10 @@ export function InboxScreen() {
           }}
           onDelete={editing !== "new" ? () => { removeTask(editing.id); setEditing(null); } : undefined}
         />
+      )}
+
+      {quickAdd && (
+        <QuickAddSheet open onClose={() => setQuickAdd(false)} defaultDoDate={null} />
       )}
     </section>
   );

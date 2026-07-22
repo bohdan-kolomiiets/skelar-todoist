@@ -87,4 +87,13 @@ describe("TodayScreen", () => {
     expect(screen.getByText("Done task")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /hide/i })).toBeInTheDocument();
   });
+
+  it("+ Add task opens the quick-add sheet", async () => {
+    renderWith();
+    await userEvent.click(screen.getByRole("button", { name: /add task/i }));
+    // QuickAddSheet's input stage (T11): dialog aria-label "Add a task", not the
+    // blank-editor's "New task" — this proves it's QuickAdd, not the old direct editor.
+    expect(screen.getByRole("dialog", { name: /add a task/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /parse with ai/i })).toBeInTheDocument();
+  });
 });

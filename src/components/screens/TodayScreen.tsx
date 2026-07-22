@@ -11,6 +11,7 @@ import { formatFullDate } from "@/lib/date/format";
 import type { Task, TaskDraft } from "@/lib/task/types";
 import { TaskRow } from "@/components/task/TaskRow";
 import { TaskEditorSheet } from "@/components/task/TaskEditorSheet";
+import { QuickAddSheet } from "@/components/task/QuickAddSheet";
 import { SettingsGear } from "@/components/nav/SettingsGear";
 
 const SECTIONS: Array<["overdue" | "morning" | "afternoon" | "evening" | "anytime", string]> = [
@@ -26,6 +27,7 @@ export function TodayScreen() {
   const { notifySaved } = useSaveNudge();
   const today = todayISO();
   const [editing, setEditing] = useState<Task | "new" | null>(null);
+  const [quickAdd, setQuickAdd] = useState(false);
   // Persisted per-screen (issue #4 #5) so "Show" survives refresh / tab switch.
   const [showCompleted, setShowCompleted] = usePersistentState("today.showCompleted", false);
 
@@ -68,7 +70,7 @@ export function TodayScreen() {
         )
       )}
 
-      <button type="button" onClick={() => setEditing("new")} className="mt-2 flex w-full items-center gap-2.5 min-h-11 py-3 text-left text-sm text-text-secondary">
+      <button type="button" onClick={() => setQuickAdd(true)} className="mt-2 flex w-full items-center gap-2.5 min-h-11 py-3 text-left text-sm text-text-secondary">
         + Add task
       </button>
 
@@ -98,6 +100,10 @@ export function TodayScreen() {
           }}
           onDelete={editing !== "new" ? () => { removeTask(editing.id); setEditing(null); } : undefined}
         />
+      )}
+
+      {quickAdd && (
+        <QuickAddSheet open onClose={() => setQuickAdd(false)} defaultDoDate={today} />
       )}
     </section>
   );
