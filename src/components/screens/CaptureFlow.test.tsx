@@ -19,6 +19,7 @@ import { CaptureFlow } from "./CaptureFlow";
 import { organize } from "@/lib/ai/organizeClient";
 import { TaskStoreProvider } from "@/lib/tasks/TaskStoreProvider";
 import { MemoryTaskStore } from "@/lib/storage/MemoryTaskStore";
+import { createTask } from "@/lib/task/createTask";
 import { AuthProvider } from "@/lib/auth/AuthProvider";
 import { LocalAuthService } from "@/lib/auth/LocalAuthService";
 import { SaveNudgeProvider } from "@/lib/nudge/SaveNudgeProvider";
@@ -257,5 +258,25 @@ describe("CaptureFlow", () => {
     await userEvent.click(screen.getByRole("button", { name: /plan it/i }));
     expect(await screen.findByText(/couldn't find any tasks/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/brain dump/i)).toHaveValue("asdfghjkl"); // dump kept
+  });
+
+  it("hides the example chip once any task exists (even without organizing)", () => {
+    localStorage.clear();
+    const service = new LocalAuthService();
+    service.startGuest();
+    // Seed the store with one task before render — the provider hydrates from
+    // it on mount, so this exercises "any task exists" without touching the
+    // firstRun/hasOrganizedOnce profile flag at all.
+    const store = new MemoryTaskStore([createTask({ title: "x" })]);
+    render(
+      <AuthProvider service={service}>
+        <SaveNudgeProvider>
+          <TaskStoreProvider store={store}>
+            <CaptureFlow />
+          </TaskStoreProvider>
+        </SaveNudgeProvider>
+      </AuthProvider>,
+    );
+    expect(screen.queryByRole("button", { name: /try an example/i })).not.toBeInTheDocument();
   });
 });

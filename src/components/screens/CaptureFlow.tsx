@@ -23,7 +23,7 @@ const PLACEHOLDER =
 
 export function CaptureFlow() {
   const router = useRouter();
-  const { addTasks } = useTasks();
+  const { addTasks, tasks } = useTasks();
   const { profile, markOrganized } = useAuth();
   const { notifySaved } = useSaveNudge();
   const { run, limitOpen, closeLimit, used, limit, isPro } = useGatedOrganize();
@@ -36,6 +36,10 @@ export function CaptureFlow() {
   const [tipsOpen, setTipsOpen] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
   const firstRun = profile?.hasOrganizedOnce !== true;
+  // The chip is a first-run affordance only — once any task exists (organized
+  // OR manually added), it's no longer relevant even if hasOrganizedOnce is
+  // still false.
+  const showExampleChip = firstRun && tasks.length === 0;
 
   const waitlist = useMemo(() => new LocalWaitlistService(), []);
 
@@ -90,7 +94,7 @@ export function CaptureFlow() {
       <div className="flex flex-1 flex-col rounded-xl border border-border bg-surface-1 p-3">
         {/* Chip in a normal-flow row (issue #4 #7) so it can never overlap the typed
             text — the old absolute+min-h-11 chip did. Wand icon per the mockup. */}
-        {firstRun && (
+        {showExampleChip && (
           <div className="flex justify-end">
             <button
               type="button"
@@ -107,7 +111,7 @@ export function CaptureFlow() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder={PLACEHOLDER}
-          className="mt-1 min-h-44 flex-1 resize-none bg-transparent text-base leading-relaxed outline-none placeholder:text-text-muted"
+          className={`${showExampleChip ? "mt-1" : "mt-0"} min-h-44 flex-1 resize-none bg-transparent text-base leading-relaxed outline-none placeholder:text-text-muted`}
         />
         <div className="mt-1 flex items-center justify-between border-t border-border pt-2">
           <button type="button" onClick={() => setTipsOpen(true)} className="inline-flex min-h-11 items-center gap-1.5 text-[13px] text-text-secondary">
