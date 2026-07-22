@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useTasks } from "@/lib/tasks/useTasks";
 import { useSaveNudge } from "@/lib/nudge/useSaveNudge";
@@ -55,7 +56,10 @@ export function TodayScreen() {
 
       {todays.length === 0 ? (
         <p className="mt-10 text-center text-text-secondary">
-          Nothing planned — capture your thoughts{hasInbox ? " or pull from Inbox" : ""}
+          Nothing planned — capture your thoughts
+          {hasInbox && (
+            <> or <Link href="/inbox" className="text-text-accent underline">pull from Inbox</Link></>
+          )}
         </p>
       ) : (
         SECTIONS.map(([key, label]) =>

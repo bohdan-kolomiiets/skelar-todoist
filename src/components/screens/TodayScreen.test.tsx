@@ -88,6 +88,17 @@ describe("TodayScreen", () => {
     expect(screen.getByRole("button", { name: /hide/i })).toBeInTheDocument();
   });
 
+  it("shows a pull-from-Inbox link when Today is empty and Inbox has items", () => {
+    const inboxTask = createTask({ title: "x", doDate: null }, { id: "inbox", order: 0 });
+    renderWith([inboxTask]);
+    expect(screen.getByRole("link", { name: /pull from inbox/i })).toHaveAttribute("href", "/inbox");
+  });
+
+  it("shows no link when both are empty", () => {
+    renderWith();
+    expect(screen.queryByRole("link", { name: /pull from inbox/i })).not.toBeInTheDocument();
+  });
+
   it("+ Add task opens the quick-add sheet", async () => {
     renderWith();
     await userEvent.click(screen.getByRole("button", { name: /add task/i }));
