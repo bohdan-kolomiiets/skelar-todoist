@@ -40,10 +40,17 @@ export const modelTaskSchema = z.object({
 });
 
 /**
- * Compile-time guard: every key `modelTaskSchema` produces must exist on
- * `ParsedTask`. `needsDate` is excluded — it's added to the model schema in a
- * later task (C-T9). If a field on `modelTaskSchema` is renamed or removed,
- * `AssertExtends`'s constraint fails and this file stops typechecking.
+ * Compile-time guard: fails typecheck if `modelTaskSchema` drops or renames a
+ * field the `ParsedTask` contract requires (missing-key drift — the direction
+ * that breaks downstream consumers). `needsDate` is excluded — it's added to
+ * the model schema in a later task (C-T9).
+ *
+ * This does NOT flag *extra* model keys: `AssertExtends<T extends U, U>` is a
+ * width-subtyping assignability check (same direction as `satisfies`), and
+ * TypeScript's structural typing allows a type to have more properties than
+ * the constraint requires — excess-property checks only fire on fresh object
+ * literals, not on a `z.infer<...>` type. So an added field on
+ * `modelTaskSchema` with no counterpart on `ParsedTask` will NOT fail here.
  *
  * (`satisfies` can't be used here directly — it only applies to value
  * expressions, not `type` declarations — so the same "T assignable to U"
