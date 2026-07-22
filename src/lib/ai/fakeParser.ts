@@ -75,11 +75,26 @@ export class FakeTaskParser implements TaskParser {
       task.time = `${t24[1].padStart(2, "0")}:${t24[2]}`;
     }
 
-    // routing: someday → null; explicit other/future date → that date; else today
+    // relative offsets: "in N days", "in N weeks", "next week" / "in a week"
+    const inDays = lower.match(/\bin\s+(\d+)\s+days?\b/);
+    const inWeeks = lower.match(/\bin\s+(\d+)\s+weeks?\b/);
+    const nextWeek = /\bnext week\b|\bin a week\b/.test(lower);
+
+    // vague unresolved timing: "later", "soon", "sometime", "at some point" —
+    // distinct from the explicit "someday"/"one day" backlog branch below.
+    const vague = /\b(later|soon|sometime|at some point|some day soon)\b/.test(lower);
+
+    // routing: someday → null; explicit other/future date → that date; vague → null + needsDate; else today
     if (/\bsomeday\b|\bone day\b/.test(lower)) {
       task.doDate = null;
     } else if (/\btomorrow\b/.test(lower)) {
       task.doDate = addDays(this.today, 1);
+    } else if (inDays) {
+      task.doDate = addDays(this.today, Number(inDays[1]));
+    } else if (inWeeks) {
+      task.doDate = addDays(this.today, 7 * Number(inWeeks[1]));
+    } else if (nextWeek) {
+      task.doDate = addDays(this.today, 7);
     } else {
       // Route by a bare weekday, but skip the weekday already consumed by "due X"
       // (deadline is not the do-date).
@@ -87,7 +102,10 @@ export class FakeTaskParser implements TaskParser {
         (w) => new RegExp(`\\b${w}\\b`).test(lower) && !(due && due[1].startsWith(w.slice(0, 3))),
       );
       if (wd) task.doDate = nextWeekday(wd, this.today);
-      else task.doDate = this.today;
+      else if (vague) {
+        task.doDate = null;
+        task.needsDate = true;
+      } else task.doDate = this.today;
     }
 
     task.title = this.cleanTitle(clause);
@@ -98,8 +116,11 @@ export class FakeTaskParser implements TaskParser {
     const t = clause
       .replace(/,?\s*\bdue\s+[a-z]+/gi, "")
       .replace(/\b(today|tomorrow|this)\b/gi, "")
+      .replace(/\bin\s+\d+\s+(days?|weeks?)\b/gi, "")
+      .replace(/\b(next week|in a week)\b/gi, "")
       .replace(/\b(morning|afternoon|evening)\b/gi, "")
       .replace(/\b(someday|one day)\b/gi, "")
+      .replace(/\b(later|soon|sometime|at some point|some day soon)\b/gi, "")
       .replace(/\b(urgent|asap|important|must)\b/gi, "")
       .replace(/\b\d{1,2}(?::\d{2})?\s*(am|pm)\b/gi, "")
       .replace(/[—–-]\s*$/g, "")

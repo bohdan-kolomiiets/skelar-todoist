@@ -46,4 +46,14 @@ describe("organize", () => {
     const result = await organize("hi");
     expect(result.freeDailyInputs).toBe(3);
   });
+
+  it("sends the client's today with the request", async () => {
+    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ tasks: [], degraded: false, freeDailyInputs: 3 }), { status: 200 }),
+    );
+    await organize("hi");
+    const body = JSON.parse((spy.mock.calls[0][1] as RequestInit).body as string);
+    expect(body).toHaveProperty("today");
+    expect(body.today).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
 });

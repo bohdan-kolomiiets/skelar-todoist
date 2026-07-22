@@ -12,6 +12,7 @@ import type { Task, TaskDraft } from "@/lib/task/types";
 import { TaskRow } from "@/components/task/TaskRow";
 import { Chip } from "@/components/task/Chip";
 import { TaskEditorSheet } from "@/components/task/TaskEditorSheet";
+import { QuickAddSheet } from "@/components/task/QuickAddSheet";
 import { SettingsGear } from "@/components/nav/SettingsGear";
 
 export function InboxScreen() {
@@ -19,13 +20,14 @@ export function InboxScreen() {
   const { notifySaved } = useSaveNudge();
   const today = todayISO();
   const [editing, setEditing] = useState<Task | "new" | null>(null);
+  const [quickAdd, setQuickAdd] = useState(false);
   // Persisted per-screen (issue #4 #5) so "Show" survives refresh / tab switch.
   const [showCompleted, setShowCompleted] = usePersistentState("inbox.showCompleted", false);
 
   const inboxAll = useMemo(() => tasks.filter((t) => viewOf(t, today) === "inbox"), [tasks, today]);
   const active = useMemo(() => inboxAll.filter((t) => t.status === "active"), [inboxAll]);
   const completed = useMemo(() => inboxAll.filter((t) => t.status === "done"), [inboxAll]);
-  const { scheduled, someday } = useMemo(() => groupInbox(active, today), [active, today]);
+  const { needsDate, scheduled, someday } = useMemo(() => groupInbox(active, today), [active, today]);
 
   const rowProps = (task: Task) => ({
     task, today, onToggle: toggleComplete, onOpen: setEditing, onMove: moveTask, moveTarget: "today" as const,
@@ -45,6 +47,15 @@ export function InboxScreen() {
         <p className="mt-10 text-center text-text-secondary">Inbox zero — nothing waiting, capture your thoughts</p>
       ) : (
         <>
+          {needsDate.length > 0 && (
+            <div>
+              <p className="mb-0.5 mt-3.5 text-[13px] font-medium text-text-secondary">Needs a date · {needsDate.length}</p>
+              <p className="mb-1 text-xs text-text-secondary">Tap to set a date.</p>
+              {needsDate.map((task) => (
+                <TaskRow key={task.id} {...rowProps(task)} />
+              ))}
+            </div>
+          )}
           {scheduled.length > 0 && (
             <div>
               <p className="mb-0.5 mt-3.5 text-[13px] font-medium text-text-secondary">Scheduled · {scheduled.length}</p>
@@ -68,7 +79,7 @@ export function InboxScreen() {
         </>
       )}
 
-      <button type="button" onClick={() => setEditing("new")} className="mt-2 flex min-h-11 w-full items-center gap-2.5 py-3 text-left text-sm text-text-secondary">
+      <button type="button" onClick={() => setQuickAdd(true)} className="mt-2 flex min-h-11 w-full items-center gap-2.5 py-3 text-left text-sm text-text-secondary">
         + Add task
       </button>
 
@@ -98,6 +109,10 @@ export function InboxScreen() {
           }}
           onDelete={editing !== "new" ? () => { removeTask(editing.id); setEditing(null); } : undefined}
         />
+      )}
+
+      {quickAdd && (
+        <QuickAddSheet open onClose={() => setQuickAdd(false)} defaultDoDate={null} />
       )}
     </section>
   );

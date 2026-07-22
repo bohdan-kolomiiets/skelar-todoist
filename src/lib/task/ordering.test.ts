@@ -65,4 +65,12 @@ describe("groupInbox", () => {
     const g = groupInbox([later, sooner], TODAY);
     expect(g.scheduled.map((x) => x.id)).toEqual([sooner.id, later.id]);
   });
+
+  it("splits needs-a-date out of someday", () => {
+    const nd = t({ doDate: null, needsDate: true });
+    const someday = t({ doDate: null });
+    const g = groupInbox([someday, nd], TODAY);
+    expect(g.needsDate.map((x) => x.id)).toEqual([nd.id]);
+    expect(g.someday.map((x) => x.id)).toEqual([someday.id]);
+  });
 });

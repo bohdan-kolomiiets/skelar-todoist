@@ -3,7 +3,7 @@
 > Living status for the project. **Update at the end of each working session** —
 > move items from Next → Done, record new decisions, note the next concrete step.
 >
-> Last updated: 2026-07-21
+> Last updated: 2026-07-22
 
 ## Current phase
 **Phase 2 — core flow merged (PR #3); issue #4 fully addressed: P1 (PR #7), P2 (PR #8), P3 (P3 PR).**
@@ -38,7 +38,22 @@ tap logs interest, **"Notify me"** joins the waitlist (signed-in = one tap, gues
 and the mic is stateful (**"You're on the list"** persists on reopen). Waitlist ≠ registration; no
 email actually sent. Verified: unit **230**, lint+typecheck clean, e2e→CI; final opus review
 Ready-to-merge (0 Critical/Important). **The guest→free→pro + voice-fake-door access ladder is now
-complete.** **Next: Milestone C** or Dayspark Phase 2.
+complete.**
+**Milestone C shipped (branch `feat/milestone-c`, 14 tasks):** edge/empty/onboarding polish +
+robustness. `useIsHydrated()` hook (dedupes the hydration trio across 4+ files), a Welcome guard
+(`RequireProfile` redirects a pre-guest visiting `/today`/`/inbox`/`/capture` to `/welcome`), a
+3-tier deadline badge, client-tz `today` threaded into `/api/organize` (fixes the server-UTC/
+client-local day-boundary mismatch) plus relative-offset date resolution ("in N days" / "in N
+weeks" / "next week"), a shared `useGatedOrganize()` hook (limit-gate + empty-parse handling, reused
+by both Capture and quick-add — no double implementation), Capture's example chip fixed to
+normal-flow layout, the additive `needsDate` flag (schema + prompt + fake-parser vague-timing
+detection: "later"/"soon"/"at some point") surfaced as an Inbox **"Needs a date"** section, a new
+**`QuickAddSheet`** (input → optional AI parse → single-task editor or multi-task Review) wired to
+"+ Add task" on both Today and Inbox, and a **link to the Inbox** from Today's empty state when
+undated tasks are waiting there. Sweep
+green: unit **263**, e2e verified (2 new Milestone-C flows: quick-add-via-AI, needs-a-date; full
+suite CI-deferred per the local `.next`-lock workaround), lint+typecheck clean.
+**Next: Milestone C follow-ups (none blocking)** or Dayspark Phase 2.
 
 ## Done
 - [x] Git repo on `main`; GitHub remote (`github.com:bohdan-kolomiiets/skelar-todoist`)
@@ -131,6 +146,29 @@ complete.** **Next: Milestone C** or Dayspark Phase 2.
   e2e green on CI, lint+typecheck clean. **Follow-up (non-blocking):** the Plan-it test asserts only
   `<svg>`-presence (doesn't distinguish the spark — kept as-is by decision); per-screen
   moments/motion/empty-states → Phase 2/3.
+- [x] **Milestone C — edge/empty/onboarding + robustness** (subagent-driven TDD, branch
+  `feat/milestone-c`, 14 tasks; spec+plan from PR #17-era design). **Cleanups:** `useIsHydrated()`
+  extracted and reused by `RequireProfile` and `useGatedOrganize` (was duplicated across 4+ files);
+  `useGatedOrganize()` centralizes the limit-gate + empty-parse-result handling so Capture and
+  `QuickAddSheet` share one implementation. **Onboarding:** a Welcome guard (`RequireProfile`)
+  redirects a pre-guest hitting `/today`, `/inbox`, or `/capture` straight to `/welcome`; Capture's
+  first-run "Try an example" chip moved into normal document flow (no more overlap with typed text).
+  **Robustness:** `/api/organize` now takes the client's local-timezone `today` instead of deriving
+  it server-side in UTC (fixes late-night/early-morning day-boundary drift); the fake parser (and
+  prompt) resolve relative offsets — "in N days", "in N weeks", "next week"/"in a week" — against
+  that `today`, closing the previously-parked "in 5 days" gap with a golden-fixture regression case;
+  the deadline badge is now 3-tier (overdue / due-soon / later) instead of binary. **needs-a-date:**
+  additive `needsDate?: boolean` on the `Task` schema, fake-parser detection of vague timing
+  ("later", "soon", "sometime", "at some point"), and a new Inbox **"Needs a date"** section
+  (`groupInbox` → `{ needsDate, scheduled, someday }`). **Quick-add:** a new `QuickAddSheet`
+  (free-text → optional "Parse with AI" → single-task editor **or** multi-task Review, same
+  empty/limit handling as Capture) wired to "+ Add task" on both Today and Inbox; Today's empty
+  state adds **a link to the Inbox** so an undated task can be found and scheduled from there.
+  Verified: unit **263**
+  (from 230 pre-Milestone-C), e2e — 2 new flows in `e2e/milestone-c.spec.ts` (quick-add-via-AI from
+  Today, an unresolved-timing dump landing in Needs-a-date) verified against a running dev server
+  via `BASE_URL`; full `npm run test:e2e` deferred to CI (local run blocked by a concurrent dev
+  server's `.next` build lock, a session-local constraint, not a test issue). lint+typecheck clean.
 
 ## Next (in order)
 1. **Dayspark UI — Phase 2/3** — per-screen "moments" (Capture/Review chaos→clarity reveal, "N sorted
@@ -138,35 +176,19 @@ complete.** **Next: Milestone C** or Dayspark Phase 2.
    192/512 PWA icons. Roadmap:
    [docs/superpowers/specs/2026-07-21-dayspark-ui-redesign-roadmap.md](./superpowers/specs/2026-07-21-dayspark-ui-redesign-roadmap.md).
    Needs its own brainstorm → plan. Overlaps issue #4 P2/P3.
-2. **Milestone C** — needs-a-date (the additive `needsDate` flag), first-run onboarding
-   (`hasOrganizedOnce`), exact empty-state copy, quick-add AI entry points, plus the deferred
-   robustness items (client-tz `today` into `/api/organize`, empty-parse-result UX,
-   deadline-badge tone) tracked in `.superpowers/sdd/progress.md`.
-3. **Access ladder (Plan 2) — COMPLETE.** M1 (PR #15) + M2 (PR #16) merged; M3 (voice waitlist) built
+2. **Access ladder (Plan 2) — COMPLETE.** M1 (PR #15) + M2 (PR #16) merged; M3 (voice waitlist) built
    & in PR. Spec:
    [docs/superpowers/specs/2026-07-21-access-ladder-design.md](./superpowers/specs/2026-07-21-access-ladder-design.md);
    plans: [M1](./superpowers/plans/2026-07-21-access-ladder.md),
    [M2](./superpowers/plans/2026-07-22-access-ladder-m2.md),
    [M3](./superpowers/plans/2026-07-22-access-ladder-m3.md). The full guest→free→pro funnel + voice
-   fake-door is done. **Deferred follow-ups** (from reviews, in `.superpowers/sdd/progress.md`):
-   extract a `useIsHydrated()` hook (the hydration trio is now in **4+ files** — highest-value
-   cleanup); PlansScreen pre-guest test + Downgrade-button padding; client-tz `today` into
-   `/api/organize`; optional `@`-guard on the waitlist email field.
+   fake-door is done. **Remaining deferred follow-ups** (from reviews, in
+   `.superpowers/sdd/progress.md`): PlansScreen pre-guest test + Downgrade-button padding;
+   optional `@`-guard on the waitlist email field. (`useIsHydrated()` and client-tz `today` →
+   `/api/organize` shipped in Milestone C.)
 
-## Parked (revisit after Dayspark UI + Milestone C)
-- **AI doesn't infer relative-offset dates.** Manual test "I need to not forget to grab a
-  delivery **in 5 days**" → task "Grab delivery" with **no date** (routed to Inbox); the
-  "in 5 days" phrase is dropped, not parked. Root cause: `buildSystemPrompt`
-  ([src/lib/ai/prompt.ts](./../src/lib/ai/prompt.ts)) only exemplifies "tomorrow" / weekday
-  names for `doDate`, never offset phrases, so the model doesn't generalize (small models
-  follow the given examples closely). **Fix approach:** (1) add relative-offset rules to the
-  prompt — "in N days → +N", "next week / in a week → +7", "in N weeks → +7N", resolved against
-  the given today's date, into `doDate`; (2) teach the deterministic `FakeTaskParser.resolveDate`
-  the same "in N days" pattern (keeps fake mode + tests consistent); (3) add a golden case
-  (`in 5 days → doDate = today+5`) to `src/lib/ai/fixtures/parseCases.ts` so it's eval-verified
-  and regression-protected. **Caveat:** LLM date arithmetic is imperfect (gpt-4o-mini flubbed
-  "Friday" once; Haiku 4.5 is better) — for bulletproof dates, resolve the offset in code rather
-  than trusting the model. Est. ~M.
+## Parked
+(none currently — the relative-offset-dates item that lived here shipped in Milestone C; see Done.)
 
 ## Open decisions
 - **(Optional, low priority) Mock-AI fallback for local dev.** Once the AI route

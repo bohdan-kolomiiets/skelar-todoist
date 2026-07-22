@@ -21,7 +21,7 @@ export function VoiceComingSoonSheet({ open, onClose }: { open: boolean; onClose
 
   const submit = (value: string) => {
     const trimmed = value.trim();
-    if (!trimmed) return;
+    if (!/.+@.+/.test(trimmed)) return;
     waitlist.join({ email: trimmed, feature: "voice", userId: profile?.id });
     setJoined(true);
   };

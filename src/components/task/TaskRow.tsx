@@ -39,14 +39,19 @@ export function TaskRow({ task, today, onToggle, onOpen, onMove, moveTarget, tra
         </span>
       </button>
 
-      <button type="button" onClick={() => onOpen(task)} className="flex-1 text-left">
-        <span className={cn("flex flex-wrap items-center gap-1.5 text-[15px]", done && "text-text-muted line-through")}>
+      <button
+        type="button"
+        onClick={() => onOpen(task)}
+        aria-label={`Open ${task.title}`}
+        className="flex-1 text-left"
+      >
+        <span aria-hidden className={cn("flex flex-wrap items-center gap-1.5 text-[15px]", done && "text-text-muted line-through")}>
           {task.priority === "high" && !done && <PriorityFlag />}
           {task.time && <span className="text-[13px] text-text-secondary">{task.time}</span>}
           {task.title}
         </span>
         {hasMetas && !done && (
-          <span className="mt-1 flex flex-wrap gap-1.5">
+          <span aria-hidden className="mt-1 flex flex-wrap gap-1.5">
             {task.deadline && <DeadlineBadge deadline={task.deadline} today={today} />}
             {task.timeOfDay && <TimeOfDayChip value={task.timeOfDay} />}
             {task.tags.map((t) => (

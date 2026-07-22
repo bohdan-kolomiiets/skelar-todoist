@@ -46,4 +46,21 @@ describe("VoiceComingSoonSheet", () => {
     expect(screen.getByText(/you['’]re on the list/i)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /notify me/i })).not.toBeInTheDocument();
   });
+
+  it("does not join with a malformed email", async () => {
+    const auth = new LocalAuthService();
+    auth.startGuest();
+    renderSheet(auth);
+    await userEvent.type(screen.getByLabelText(/email/i), "notanemail");
+    await userEvent.click(screen.getByRole("button", { name: /notify me/i }));
+    expect(screen.queryByText(/you['’]re on the list/i)).not.toBeInTheDocument(); // stayed on the form
+  });
+
+  it("one-taps a name-only signed-in user via the email field (no known email)", async () => {
+    const auth = new LocalAuthService();
+    auth.startGuest();
+    auth.signIn({ emailOrName: "Sam" }); // name only → no email
+    renderSheet(auth);
+    expect(screen.getByLabelText(/email/i)).toBeInTheDocument(); // falls to the email field
+  });
 });

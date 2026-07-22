@@ -34,4 +34,11 @@ describe("PlansScreen", () => {
     await userEvent.click(screen.getByRole("button", { name: /downgrade to free/i }));
     expect(service.current()?.tier).toBe("free");
   });
+
+  it("shows a Get started link (no upgrade) for a pre-guest with no profile", () => {
+    const service = new LocalAuthService(); // never startGuest → current() null
+    renderPlans(service);
+    expect(screen.getByRole("link", { name: /get started/i })).toHaveAttribute("href", "/welcome");
+    expect(screen.queryByRole("button", { name: /upgrade to pro/i })).not.toBeInTheDocument();
+  });
 });

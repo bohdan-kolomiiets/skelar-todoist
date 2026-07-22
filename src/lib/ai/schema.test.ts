@@ -49,6 +49,7 @@ describe("modelTaskSchema (OpenAI strict-mode output contract)", () => {
       deadline: null,
       priority: null,
       tags: null,
+      needsDate: null,
     });
     expect(parsed.title).toBe("Finish deck");
   });
@@ -63,6 +64,7 @@ describe("modelTaskSchema (OpenAI strict-mode output contract)", () => {
       deadline: null,
       priority: null,
       tags: null,
+      needsDate: null,
     });
     expect(() => parsedTaskSchema.parse(modelOut)).not.toThrow();
   });
