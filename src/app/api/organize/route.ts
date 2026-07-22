@@ -4,6 +4,7 @@ import { resolveFreeDailyInputs } from "@/lib/ai/limits";
 import { parsedTasksSchema } from "@/lib/ai/schema";
 import { FakeTaskParser } from "@/lib/ai/fakeParser";
 import { GatewayTaskParser } from "@/lib/ai/gatewayParser";
+import { todayISO } from "@/lib/date/clock";
 import type { ParsedTask } from "@/lib/task/types";
 
 /**
@@ -12,14 +13,18 @@ import type { ParsedTask } from "@/lib/task/types";
  */
 export async function POST(request: Request): Promise<Response> {
   let text: unknown;
+  let today: unknown;
   try {
-    ({ text } = await request.json());
+    ({ text, today } = await request.json());
   } catch {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
   if (typeof text !== "string" || !text.trim()) {
     return NextResponse.json({ error: "Please enter something to plan." }, { status: 400 });
   }
+  // Client's local today, so dates resolve in the user's timezone, not the server's.
+  // Validated and falls back rather than throwing on anything malformed.
+  const clientToday = typeof today === "string" && /^\d{4}-\d{2}-\d{2}$/.test(today) ? today : todayISO();
 
   const mode = await resolveAiMode();
   console.log(`[/api/organize] aiMode=${mode}`);
@@ -32,17 +37,21 @@ export async function POST(request: Request): Promise<Response> {
       const model = await resolveAiModel();
       console.log(`[/api/organize] aiModel=${model}`);
       try {
-        parsed = await new GatewayTaskParser({ model, apiKey: process.env.AI_API_KEY }).parse(text);
+        parsed = await new GatewayTaskParser({
+          model,
+          apiKey: process.env.AI_API_KEY,
+          today: clientToday,
+        }).parse(text);
       } catch (err) {
         // Real AI unavailable (gateway/model/billing/timeout). Stay demo-safe:
         // fall back to the deterministic parser so the user still gets a plan,
         // and flag it so the UI can be honest instead of failing outright.
         console.error("[/api/organize] real parser unavailable — falling back to fake:", err);
-        parsed = await new FakeTaskParser().parse(text);
+        parsed = await new FakeTaskParser({ today: clientToday }).parse(text);
         degraded = true;
       }
     } else {
-      parsed = await new FakeTaskParser().parse(text);
+      parsed = await new FakeTaskParser({ today: clientToday }).parse(text);
     }
     const tasks = parsedTasksSchema.parse(parsed); // enforce the contract before it reaches the client
     return NextResponse.json({ tasks, degraded, freeDailyInputs });

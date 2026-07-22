@@ -22,6 +22,7 @@ vi.mock("@/lib/ai/gatewayParser", () => ({
 vi.spyOn(console, "log").mockImplementation(() => {});
 
 import { POST } from "./route";
+import { todayISO } from "@/lib/date/clock";
 
 const origKey = process.env.AI_API_KEY;
 beforeEach(() => {
@@ -39,7 +40,11 @@ describe("POST /api/organize — real-mode model + key wiring", () => {
       new Request("http://test/api/organize", { method: "POST", body: JSON.stringify({ text: "Gym" }) }),
     );
     expect(res.status).toBe(200);
-    expect(ctorArgs.value).toEqual({ model: "anthropic/claude-haiku-4.5", apiKey: "sk-ant-test" });
+    expect(ctorArgs.value).toEqual({
+      model: "anthropic/claude-haiku-4.5",
+      apiKey: "sk-ant-test",
+      today: todayISO(),
+    });
     const json = await res.json();
     expect(json.degraded).toBe(false);
   });

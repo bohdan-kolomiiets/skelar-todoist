@@ -1,4 +1,5 @@
 import type { ParsedTask } from "@/lib/task/types";
+import { todayISO } from "@/lib/date/clock";
 
 export interface OrganizeResult {
   tasks: ParsedTask[];
@@ -13,7 +14,7 @@ export async function organize(text: string): Promise<OrganizeResult> {
   const res = await fetch("/api/organize", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({ text, today: todayISO() }),
   });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(json.error ?? "Something went wrong. Please try again.");

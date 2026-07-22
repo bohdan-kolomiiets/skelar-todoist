@@ -9,6 +9,8 @@ export function buildSystemPrompt({ today, knownTags = [] }: { today: string; kn
     "- notes: extra detail that doesn't fit the title.",
     "- doDate: 'YYYY-MM-DD', the day to DO it. Default to today for actionable items.",
     "  Use a future date only when the user states one (e.g. 'tomorrow', a weekday).",
+    "  Relative offsets resolve against today's date: 'in N days' → today+N;",
+    "  'next week' / 'in a week' → today+7; 'in N weeks' → today+7*N. Put the result in doDate.",
     "  Use null for vague backlog ('someday', 'one day', hobbies with no date).",
     "- time: 'HH:mm' only if an exact time is given.",
     "- timeOfDay: 'morning' | 'afternoon' | 'evening' when a part of day is mentioned.",

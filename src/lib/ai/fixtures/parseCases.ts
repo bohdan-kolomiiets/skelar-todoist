@@ -57,4 +57,12 @@ export const parseCases: { name: string; input: string; invariants(tasks: Parsed
       assert.ok(tasks.some((t) => t.deadline), "the deck has a deadline");
     },
   },
+  {
+    name: "relative-offset-in-n-days",
+    input: "Grab delivery in 5 days",
+    invariants(tasks) {
+      assert.equal(tasks.length, 1);
+      assert.equal(tasks[0].doDate, "2026-07-25", "'in 5 days' → today (2026-07-20) + 5");
+    },
+  },
 ];

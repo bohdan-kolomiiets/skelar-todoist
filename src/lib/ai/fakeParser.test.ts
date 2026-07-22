@@ -33,4 +33,20 @@ describe("FakeTaskParser (golden dataset)", () => {
     expect(task.doDate).toBe("2026-07-23"); // Thursday — the do-date weekday
     expect(task.deadline).toBe("2026-07-21"); // due Tuesday — the deadline
   });
+
+  it("resolves 'in N days' to today+N", async () => {
+    const [t] = await parser.parse("grab delivery in 5 days");
+    expect(t.doDate).toBe("2026-07-25");
+    expect(t.title).toBe("Grab delivery");
+  });
+
+  it("resolves 'next week' / 'in a week' to today+7", async () => {
+    const [a] = await parser.parse("email supplier next week");
+    expect(a.doDate).toBe("2026-07-27");
+  });
+
+  it("resolves 'in N weeks' to today+7N", async () => {
+    const [t] = await parser.parse("renew pass in 2 weeks");
+    expect(t.doDate).toBe("2026-08-03");
+  });
 });
