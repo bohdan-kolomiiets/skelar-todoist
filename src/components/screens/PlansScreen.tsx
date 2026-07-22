@@ -51,7 +51,7 @@ export function PlansScreen() {
           Get started
         </Link>
       ) : isPro ? (
-        <button type="button" onClick={downgrade} className="min-h-11 text-[15px] text-text-secondary">
+        <button type="button" onClick={downgrade} className="min-h-11 rounded-full px-4 text-[15px] text-text-secondary">
           Downgrade to Free
         </button>
       ) : (
