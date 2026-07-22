@@ -51,7 +51,7 @@ export function QuickAddSheet({
       setNotice(out.message);
       return;
     }
-    if (out.tasks.length === 1) setStage({ kind: "editor", initial: out.tasks[0] as TaskDraft });
+    if (out.tasks.length === 1) setStage({ kind: "editor", initial: out.tasks[0] });
     else setStage({ kind: "review", proposal: out.tasks });
   }
 

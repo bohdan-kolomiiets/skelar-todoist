@@ -70,6 +70,40 @@ describe("useTasks", () => {
     expect(store.load()).toHaveLength(2);
   });
 
+  it("clears needsDate once a task is dated, and does not resurrect it when undated again", () => {
+    const store = new MemoryTaskStore();
+    const { result } = renderHook(() => useTasks(), { wrapper: wrapper(store) });
+    let id = "";
+    act(() => {
+      id = result.current.addTask({ title: "Someday-ish", doDate: null }).id;
+    });
+    act(() => result.current.updateTask(id, { needsDate: true }));
+    expect(result.current.tasks[0].needsDate).toBe(true);
+
+    // Resolving via the editor (setting a real doDate) must clear needsDate.
+    act(() => result.current.updateTask(id, { doDate: "2026-07-25" }));
+    expect(result.current.tasks[0].needsDate).toBe(false);
+
+    // Clearing the date again must NOT resurrect needsDate — task goes to Someday, not Needs-a-date.
+    act(() => result.current.updateTask(id, { doDate: null }));
+    expect(result.current.tasks[0].needsDate).toBe(false);
+  });
+
+  it("moveTask to today clears needsDate", () => {
+    const store = new MemoryTaskStore();
+    const { result } = renderHook(() => useTasks(), { wrapper: wrapper(store) });
+    let id = "";
+    act(() => {
+      id = result.current.addTask({ title: "Vague timing", doDate: null }).id;
+    });
+    act(() => result.current.updateTask(id, { needsDate: true }));
+    expect(result.current.tasks[0].needsDate).toBe(true);
+
+    act(() => result.current.moveTask(id, "today"));
+    expect(result.current.tasks[0].needsDate).toBe(false);
+    expect(result.current.tasks[0].doDate).not.toBeNull();
+  });
+
   it("persists toggleComplete and moveTask to the store, not just React state", () => {
     const store = new MemoryTaskStore();
     const { result } = renderHook(() => useTasks(), { wrapper: wrapper(store) });

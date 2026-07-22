@@ -80,7 +80,16 @@ export function TaskStoreProvider({ store, children }: { store?: TaskStore; chil
   );
 
   const updateTask = useCallback(
-    (id: string, patch: Partial<Task>) => commit((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t))),
+    (id: string, patch: Partial<Task>) =>
+      commit((prev) =>
+        prev.map((t) => {
+          if (t.id !== id) return t;
+          const next = { ...t, ...patch };
+          // Invariant: needsDate ⟹ doDate is null. A dated task is never "needs a date".
+          if (next.doDate != null) next.needsDate = false;
+          return next;
+        }),
+      ),
     [commit],
   );
 
@@ -102,7 +111,15 @@ export function TaskStoreProvider({ store, children }: { store?: TaskStore; chil
 
   const moveTask = useCallback(
     (id: string, view: "today" | "inbox") =>
-      commit((prev) => prev.map((t) => (t.id === id ? { ...t, doDate: view === "today" ? todayISO() : null } : t))),
+      commit((prev) =>
+        prev.map((t) =>
+          t.id === id
+            ? view === "today"
+              ? { ...t, doDate: todayISO(), needsDate: false }
+              : { ...t, doDate: null }
+            : t,
+        ),
+      ),
     [commit],
   );
 
