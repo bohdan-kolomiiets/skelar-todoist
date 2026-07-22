@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useSyncExternalStore } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { IconWand, IconHelpCircle, IconMicrophone, IconSparkles } from "@tabler/icons-react";
 import { DaysparkWordmark } from "@/components/brand/DaysparkWordmark";
@@ -13,6 +13,7 @@ import { useTasks } from "@/lib/tasks/useTasks";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useSaveNudge } from "@/lib/nudge/useSaveNudge";
 import { usePersistentState } from "@/lib/preferences/usePersistentState";
+import { useIsHydrated } from "@/lib/hooks/useIsHydrated";
 import { LocalUsageService, USAGE_KEY } from "@/lib/usage/LocalUsageService";
 import { LocalWaitlistService } from "@/lib/waitlist/LocalWaitlistService";
 import { profileKey } from "@/lib/profile/profileKey";
@@ -24,14 +25,6 @@ const EXAMPLE_DUMP =
   "Finish the pitch deck today, due Friday. Gym this evening. Reply to Anna — urgent. Someday read that design book.";
 const PLACEHOLDER =
   "What's on your mind?\n\nGet everything out of your head — tasks, errands, deadlines. I'll sort it into your day.";
-
-// Hydration-safe: mirrors AuthProvider/TaskStoreProvider (see those files for the
-// full rationale). getServerSnapshot's `false` is what both the server render and
-// the client's first (hydration) render see, so adopting real client-only values
-// (below) can never desync from the server-sent markup.
-const neverSubscribe = () => () => {};
-const getIsHydratedOnClient = () => true;
-const getIsHydratedOnServer = () => false;
 
 export function CaptureFlow() {
   const router = useRouter();
@@ -74,7 +67,7 @@ export function CaptureFlow() {
   // because sign-in (SaveNudgeSheet, on Today/Inbox) and upgrade (/plans) both
   // remount Capture on return; an in-place sign-in/upgrade without leaving Capture
   // would need `used` re-synced too.
-  const isHydrated = useSyncExternalStore(neverSubscribe, getIsHydratedOnClient, getIsHydratedOnServer);
+  const isHydrated = useIsHydrated();
   const [used, setUsed] = useState(0);
   const [usedHydrated, setUsedHydrated] = useState(false);
   if (isHydrated && !usedHydrated) {

@@ -1,11 +1,12 @@
 "use client";
 
-import { createContext, useCallback, useMemo, useState, useSyncExternalStore } from "react";
+import { createContext, useCallback, useMemo, useState } from "react";
 import type { Task, ParsedTask, TaskDraft } from "../task/types";
 import { createTask } from "../task/createTask";
 import { todayISO, nowISO } from "../date/clock";
 import type { TaskStore } from "../storage/TaskStore";
 import { LocalTaskStore } from "../storage/LocalTaskStore";
+import { useIsHydrated } from "../hooks/useIsHydrated";
 
 export interface TaskContextValue {
   tasks: Task[];
@@ -19,24 +20,13 @@ export interface TaskContextValue {
 
 export const TaskContext = createContext<TaskContextValue | null>(null);
 
-// There's no external source to subscribe to (the store only ever changes
-// through our own commit() calls below), so `subscribe` is a permanent no-op.
-// This useSyncExternalStore is used purely to learn, in a hydration-safe way,
-// whether the client's hydration render has already committed:
-// getServerSnapshot's `false` is what both the server AND the client's first
-// (hydration) render see, so it can never desync from the server-sent markup;
-// it flips to `true` (getSnapshot) only once hydration has committed.
-const neverSubscribe = () => () => {};
-const getIsHydratedOnClient = () => true;
-const getIsHydratedOnServer = () => false;
-
 export function TaskStoreProvider({ store, children }: { store?: TaskStore; children: React.ReactNode }) {
   // Lazy singleton (constructed once). useState lazy-init keeps this lint-clean
   // vs. mutating a ref during render. The default LocalTaskStore's constructor
   // is SSR-safe (it never touches localStorage until load()/save()).
   const [active] = useState<TaskStore>(() => store ?? new LocalTaskStore());
 
-  const isHydrated = useSyncExternalStore(neverSubscribe, getIsHydratedOnClient, getIsHydratedOnServer);
+  const isHydrated = useIsHydrated();
 
   // Start empty so the server render and the client's first (hydration) render
   // agree — LocalTaskStore.load() returns [] on the server but real data in the

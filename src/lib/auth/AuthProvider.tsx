@@ -1,9 +1,10 @@
 "use client";
 
-import { createContext, useCallback, useMemo, useState, useSyncExternalStore } from "react";
+import { createContext, useCallback, useMemo, useState } from "react";
 import type { AuthService, Profile, Tier } from "./types";
 import { LocalAuthService } from "./LocalAuthService";
 import { LocalBillingService } from "../billing/LocalBillingService";
+import { useIsHydrated } from "../hooks/useIsHydrated";
 
 export interface AuthContextValue {
   profile: Profile | null;
@@ -20,14 +21,10 @@ export interface AuthContextValue {
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
-const neverSubscribe = () => () => {};
-const getIsHydratedOnClient = () => true;
-const getIsHydratedOnServer = () => false;
-
 export function AuthProvider({ service, children }: { service?: AuthService; children: React.ReactNode }) {
   const [active] = useState<AuthService>(() => service ?? new LocalAuthService());
   const [billing] = useState(() => new LocalBillingService(active));
-  const isHydrated = useSyncExternalStore(neverSubscribe, getIsHydratedOnClient, getIsHydratedOnServer);
+  const isHydrated = useIsHydrated();
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loaded, setLoaded] = useState(false);
