@@ -248,4 +248,14 @@ describe("CaptureFlow", () => {
     const stored = JSON.parse(localStorage.getItem(profileKey(USAGE_KEY, guest.id))!);
     expect(stored.count).toBe(1);
   });
+
+  it("shows an inline notice and stays on the composer when the parse finds no tasks", async () => {
+    localStorage.clear();
+    vi.mocked(organize).mockResolvedValue({ tasks: [], degraded: false, freeDailyInputs: 3 });
+    renderCapture();
+    await userEvent.type(screen.getByLabelText(/brain dump/i), "asdfghjkl");
+    await userEvent.click(screen.getByRole("button", { name: /plan it/i }));
+    expect(await screen.findByText(/couldn't find any tasks/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/brain dump/i)).toHaveValue("asdfghjkl"); // dump kept
+  });
 });

@@ -8,16 +8,11 @@ import { TipsSheet } from "@/components/capture/TipsSheet";
 import { VoiceComingSoonSheet } from "@/components/capture/VoiceComingSoonSheet";
 import { LimitReachedSheet } from "@/components/billing/LimitReachedSheet";
 import { SettingsGear } from "@/components/nav/SettingsGear";
-import { organize } from "@/lib/ai/organizeClient";
+import { useGatedOrganize } from "@/lib/ai/useGatedOrganize";
 import { useTasks } from "@/lib/tasks/useTasks";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useSaveNudge } from "@/lib/nudge/useSaveNudge";
-import { usePersistentState } from "@/lib/preferences/usePersistentState";
-import { useIsHydrated } from "@/lib/hooks/useIsHydrated";
-import { LocalUsageService, USAGE_KEY } from "@/lib/usage/LocalUsageService";
 import { LocalWaitlistService } from "@/lib/waitlist/LocalWaitlistService";
-import { profileKey } from "@/lib/profile/profileKey";
-import { todayISO } from "@/lib/date/clock";
 import type { ParsedTask } from "@/lib/task/types";
 import { ReviewScreen } from "./ReviewScreen";
 
@@ -29,73 +24,39 @@ const PLACEHOLDER =
 export function CaptureFlow() {
   const router = useRouter();
   const { addTasks } = useTasks();
-  const { profile, isPro, markOrganized } = useAuth();
+  const { profile, markOrganized } = useAuth();
   const { notifySaved } = useSaveNudge();
+  const { run, limitOpen, closeLimit, used, limit, isPro } = useGatedOrganize();
   const [text, setText] = useState("");
   const [proposal, setProposal] = useState<ParsedTask[] | null>(null);
   const [degraded, setDegraded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [tipsOpen, setTipsOpen] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
   const firstRun = profile?.hasOrganizedOnce !== true;
 
   const waitlist = useMemo(() => new LocalWaitlistService(), []);
 
-  const today = todayISO();
-  const usage = useMemo(
-    () => new LocalUsageService(profileKey(USAGE_KEY, profile?.id ?? "guest")),
-    [profile?.id],
-  );
-  // freeDailyInputs — an admin-config value, not per-profile — persisted via the
-  // preference seam so a fresh mount (reload, new tab, back navigation) knows the
-  // real limit immediately instead of assuming the hardcoded default of 3. Without
-  // this, the pre-organize gate below under-counts on every remount — e.g. with a
-  // configured limit of 1, a returning user whose local state reset to the default
-  // of 3 would sail past the gate and trigger an extra, unbudgeted organize() call
-  // before the server's echoed freeDailyInputs corrected it. usePersistentState is
-  // itself hydration-safe (defaults to 3 through the first/hydration render, then
-  // adopts the stored value), so this can't desync from the server-sent markup.
-  const [limit, setLimit] = usePersistentState<number>("freeDailyInputs", 3);
-
-  // today's count, for the "N left" display + limit sheet. Hydration-safe like
-  // `limit`/`isHydrated` above: `usage.count(today)` reads localStorage, which would
-  // desync SSR (no localStorage → 0) from a returning user's real client-side count
-  // if read directly during render, so it's adopted once, right after hydration
-  // commits, via the same during-render pattern as TaskStoreProvider/AuthProvider.
-  // Adopted only that once and then re-synced solely inside planIt() — correct only
-  // because sign-in (SaveNudgeSheet, on Today/Inbox) and upgrade (/plans) both
-  // remount Capture on return; an in-place sign-in/upgrade without leaving Capture
-  // would need `used` re-synced too.
-  const isHydrated = useIsHydrated();
-  const [used, setUsed] = useState(0);
-  const [usedHydrated, setUsedHydrated] = useState(false);
-  if (isHydrated && !usedHydrated) {
-    setUsedHydrated(true);
-    setUsed(usage.count(today));
-  }
-  const [limitOpen, setLimitOpen] = useState(false);
-
   async function planIt() {
-    if (!isPro && usage.remaining(today, limit) <= 0) {
-      setUsed(usage.count(today));
-      setLimitOpen(true);
-      return; // non-blocking: no parse runs
-    }
-    setBusy(true);
     setError(null);
+    setNotice(null);
+    setBusy(true);
     try {
-      const { tasks, degraded, freeDailyInputs } = await organize(text);
-      setLimit(freeDailyInputs);
-      if (!isPro) {
-        usage.increment(today);
-        setUsed(usage.count(today));
+      const out = await run(text);
+      if (out.status === "blocked") return; // non-blocking: no parse runs, limit sheet already open
+      if (out.status === "empty") {
+        setNotice("I couldn't find any tasks in that — try rephrasing.");
+        return;
       }
-      if (tasks.length > 0) markOrganized();
-      setDegraded(degraded);
-      setProposal(tasks);
-    } catch (e) {
-      setError((e as Error).message);
+      if (out.status === "error") {
+        setError(out.message);
+        return;
+      }
+      markOrganized();
+      setDegraded(out.degraded);
+      setProposal(out.tasks);
     } finally {
       setBusy(false);
     }
@@ -177,6 +138,7 @@ export function CaptureFlow() {
         </div>
       </div>
       {error && <p className="text-[13px] text-text-danger">{error}</p>}
+      {notice && <p className="text-[13px] text-text-secondary">{notice}</p>}
       {!isPro && (
         <p className="text-[13px] text-text-muted">
           {Math.max(0, limit - used)} of {limit} AI plans left today
@@ -192,7 +154,7 @@ export function CaptureFlow() {
           each open is a fresh mount — the sheet's joined-state initializer genuinely
           re-reads storage every time, instead of running once at CaptureFlow mount. */}
       {voiceOpen && <VoiceComingSoonSheet open onClose={() => setVoiceOpen(false)} />}
-      <LimitReachedSheet open={limitOpen} onClose={() => setLimitOpen(false)} used={used} limit={limit} />
+      <LimitReachedSheet open={limitOpen} onClose={closeLimit} used={used} limit={limit} />
     </section>
   );
 }
