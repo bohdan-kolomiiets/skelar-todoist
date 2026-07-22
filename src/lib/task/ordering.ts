@@ -45,6 +45,8 @@ export function groupInbox(tasks: Task[], today: string) {
   const scheduled = tasks
     .filter((t) => t.doDate !== null && t.doDate > today)
     .sort((a, b) => (a.doDate! < b.doDate! ? -1 : a.doDate! > b.doDate! ? 1 : a.order - b.order));
-  const someday = tasks.filter((t) => t.doDate === null).sort((a, b) => a.order - b.order);
-  return { scheduled, someday };
+  const undated = tasks.filter((t) => t.doDate === null);
+  const needsDate = undated.filter((t) => t.needsDate === true).sort((a, b) => a.order - b.order);
+  const someday = undated.filter((t) => t.needsDate !== true).sort((a, b) => a.order - b.order);
+  return { needsDate, scheduled, someday };
 }

@@ -49,6 +49,15 @@ describe("InboxScreen", () => {
     expect(screen.getByText("Jan 1")).toBeInTheDocument();
   });
 
+  it("renders the Needs a date section", () => {
+    const tasks = [
+      createTask({ title: "Call the vet", doDate: null, needsDate: true }, { id: "n1", order: 1 }),
+    ];
+    renderWith(tasks);
+    expect(screen.getByText(/needs a date · 1/i)).toBeInTheDocument();
+    expect(screen.getByText("Call the vet")).toBeInTheDocument();
+  });
+
   it("shows and hides completed tasks on toggle", async () => {
     const tasks = [createTask({ title: "Learn guitar", doDate: null }, { id: "s1", order: 1 })];
     renderWith(tasks);

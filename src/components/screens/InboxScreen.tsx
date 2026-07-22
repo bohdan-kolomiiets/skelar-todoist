@@ -25,7 +25,7 @@ export function InboxScreen() {
   const inboxAll = useMemo(() => tasks.filter((t) => viewOf(t, today) === "inbox"), [tasks, today]);
   const active = useMemo(() => inboxAll.filter((t) => t.status === "active"), [inboxAll]);
   const completed = useMemo(() => inboxAll.filter((t) => t.status === "done"), [inboxAll]);
-  const { scheduled, someday } = useMemo(() => groupInbox(active, today), [active, today]);
+  const { needsDate, scheduled, someday } = useMemo(() => groupInbox(active, today), [active, today]);
 
   const rowProps = (task: Task) => ({
     task, today, onToggle: toggleComplete, onOpen: setEditing, onMove: moveTask, moveTarget: "today" as const,
@@ -45,6 +45,15 @@ export function InboxScreen() {
         <p className="mt-10 text-center text-text-secondary">Inbox zero — nothing waiting, capture your thoughts</p>
       ) : (
         <>
+          {needsDate.length > 0 && (
+            <div>
+              <p className="mb-0.5 mt-3.5 text-[13px] font-medium text-text-secondary">Needs a date · {needsDate.length}</p>
+              <p className="mb-1 text-xs text-text-secondary">Tap to set a date.</p>
+              {needsDate.map((task) => (
+                <TaskRow key={task.id} {...rowProps(task)} />
+              ))}
+            </div>
+          )}
           {scheduled.length > 0 && (
             <div>
               <p className="mb-0.5 mt-3.5 text-[13px] font-medium text-text-secondary">Scheduled · {scheduled.length}</p>
