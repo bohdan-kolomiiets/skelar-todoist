@@ -1,7 +1,9 @@
 import { test, expect } from "@playwright/test";
 
 test("brain dump → AI structures tasks → Today plan (fake mode)", async ({ page }) => {
-  await page.goto("/capture");
+  // Enter as a guest (the (app) group redirects pre-guest visitors to Welcome).
+  await page.goto("/");
+  await page.getByRole("button", { name: /get started/i }).click();
 
   // Fill the canonical example dump and plan it.
   await page.getByRole("button", { name: /try an example/i }).click();
@@ -14,6 +16,8 @@ test("brain dump → AI structures tasks → Today plan (fake mode)", async ({ p
 
   // Commit → land on Today with the parsed tasks.
   await commit.click();
+  // First save as a guest triggers the "save your plan" nudge — dismiss it.
+  await page.getByRole("button", { name: /continue as guest/i }).click();
   await expect(page).toHaveURL(/\/today/);
   await expect(page.getByText("Gym")).toBeVisible();
   await expect(page.getByText("Reply to Anna")).toBeVisible();
@@ -25,10 +29,12 @@ test("brain dump → AI structures tasks → Today plan (fake mode)", async ({ p
 });
 
 test("a completed task moves under the Completed toggle", async ({ page }) => {
-  await page.goto("/capture");
+  await page.goto("/");
+  await page.getByRole("button", { name: /get started/i }).click();
   await page.getByRole("button", { name: /try an example/i }).click();
   await page.getByRole("button", { name: /plan it/i }).click();
   await page.getByRole("button", { name: /add 4 tasks/i }).click();
+  await page.getByRole("button", { name: /continue as guest/i }).click(); // dismiss the save nudge
 
   await page.getByRole("button", { name: /^complete$/i }).first().click();
   await expect(page.getByText(/1 of 3 done/i)).toBeVisible();
