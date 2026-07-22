@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { ParsedTask } from "@/lib/task/types";
 
 /**
  * One parsed task = the parseable fields only (PRODUCT §3 output contract).
@@ -37,3 +38,20 @@ export const modelTaskSchema = z.object({
   priority: z.enum(["high", "medium", "low", "none"]).nullable(),
   tags: z.array(z.string()).nullable(),
 });
+
+/**
+ * Compile-time guard: every key `modelTaskSchema` produces must exist on
+ * `ParsedTask`. `needsDate` is excluded — it's added to the model schema in a
+ * later task (C-T9). If a field on `modelTaskSchema` is renamed or removed,
+ * `AssertExtends`'s constraint fails and this file stops typechecking.
+ *
+ * (`satisfies` can't be used here directly — it only applies to value
+ * expressions, not `type` declarations — so the same "T assignable to U"
+ * check is expressed via a constrained generic instead.)
+ */
+type AssertExtends<T extends U, U> = T;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- type-only compile-time guard; never referenced at runtime
+type _ModelSchemaMatchesParsedTask = AssertExtends<
+  z.infer<typeof modelTaskSchema>,
+  Record<keyof Omit<ParsedTask, "needsDate">, unknown>
+>;

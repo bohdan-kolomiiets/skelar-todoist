@@ -64,4 +64,9 @@ describe("TaskEditorSheet", () => {
     const close = screen.getByRole("button", { name: /close/i });
     expect(close.querySelector("svg")).toBeInTheDocument();
   });
+
+  it("marks the dialog as modal", () => {
+    render(<TaskEditorSheet open initial={{ title: "T" }} onClose={vi.fn()} onSave={vi.fn()} />);
+    expect(screen.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
+  });
 });

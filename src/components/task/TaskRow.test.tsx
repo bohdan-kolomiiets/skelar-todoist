@@ -56,4 +56,9 @@ describe("TaskRow", () => {
     const move = screen.getByRole("button", { name: /move to/i });
     expect(move.querySelector("svg")).toBeInTheDocument();
   });
+
+  it("gives the open control an explicit accessible name", () => {
+    render(<TaskRow task={task} today={TODAY} onToggle={vi.fn()} onOpen={vi.fn()} onMove={vi.fn()} moveTarget="inbox" />);
+    expect(screen.getByRole("button", { name: /open finish the pitch deck/i })).toBeInTheDocument();
+  });
 });
