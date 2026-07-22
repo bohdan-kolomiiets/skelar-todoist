@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useIsHydrated } from "@/lib/hooks/useIsHydrated";
@@ -15,9 +16,10 @@ export function RequireProfile({ children }: { children: React.ReactNode }) {
   const { profile } = useAuth();
   const isHydrated = useIsHydrated();
 
-  if (isHydrated && profile === null) {
-    router.replace("/welcome");
-    return null;
-  }
+  useEffect(() => {
+    if (isHydrated && profile === null) router.replace("/welcome");
+  }, [isHydrated, profile, router]);
+
+  if (isHydrated && profile === null) return null; // hide children while redirecting
   return <>{children}</>;
 }
