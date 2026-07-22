@@ -26,6 +26,21 @@ describe("QuickAddSheet", () => {
     vi.restoreAllMocks();
   });
 
+  it("keeps focus on the text field while typing", async () => {
+    renderSheet();
+    const field = screen.getByLabelText(/new task/i);
+    field.focus();
+    await userEvent.type(field, "b");
+    expect(field).toHaveFocus();
+    await userEvent.type(field, "c");
+    expect(field).toHaveFocus();
+  });
+
+  it("shows the remaining AI-plan counter for non-Pro users", () => {
+    renderSheet();
+    expect(screen.getByText(/3 of 3 AI plans left today/i)).toBeInTheDocument();
+  });
+
   it("Enter manually opens a blank editor", async () => {
     renderSheet();
     await userEvent.click(screen.getByRole("button", { name: /enter manually/i }));
