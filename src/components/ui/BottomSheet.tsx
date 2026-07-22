@@ -18,9 +18,15 @@ interface Props {
 export function BottomSheet({ open, onClose, ariaLabel, children }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
 
+  // Focus the panel once per open transition. Keyed on `open` alone — depending
+  // on `onClose` (often a fresh closure each render) would re-run this on every
+  // parent re-render and yank focus off an input mid-typing (see QuickAddSheet).
+  useEffect(() => {
+    if (open) panelRef.current?.focus();
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
-    panelRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };

@@ -24,7 +24,7 @@ export function QuickAddSheet({
   defaultDoDate: string | null;
 }) {
   const { addTask, addTasks } = useTasks();
-  const { run, limitOpen, closeLimit, used, limit } = useGatedOrganize();
+  const { run, limitOpen, closeLimit, used, limit, isPro } = useGatedOrganize();
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -100,6 +100,11 @@ export function QuickAddSheet({
           className="mt-3 min-h-24 w-full resize-none rounded-lg border border-border bg-surface-2 p-3 text-base outline-none"
         />
         {notice && <p className="mt-1 text-[13px] text-text-secondary">{notice}</p>}
+        {!isPro && (
+          <p className="mt-2 text-[13px] text-text-muted">
+            {Math.max(0, limit - used)} of {limit} AI plans left today
+          </p>
+        )}
         <div className="mt-3 flex items-center justify-between">
           <button
             type="button"
